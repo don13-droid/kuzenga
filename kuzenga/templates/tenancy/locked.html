@@ -1,0 +1,8 @@
+{% extends "base/base.html" %}
+{% block content %}
+<div class="max-w-lg bg-white rounded-lg shadow p-6">
+  <h1 class="text-xl font-semibold mb-2">{{ module.name|default:code }} is not included in your plan</h1>
+  <p class="text-slate-600">{{ module.description }}</p>
+  <p class="mt-4 text-sm">Contact Kuzenga to add this module to your subscription.</p>
+</div>
+{% endblock %}

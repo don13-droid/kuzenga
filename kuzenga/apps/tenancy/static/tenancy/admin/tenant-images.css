@@ -1,0 +1,16 @@
+.tenant-image-preview {
+  margin-top: 0.75rem;
+}
+
+.tenant-image-preview img {
+  max-width: 10rem;
+  max-height: 8rem;
+  border: 1px solid #d8deeb;
+  border-radius: 0.5rem;
+  object-fit: contain;
+  background: #f5f7fc;
+}
+
+.tenant-image-preview img[hidden] {
+  display: none;
+}

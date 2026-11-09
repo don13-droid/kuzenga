@@ -1,0 +1,25 @@
+{% extends "base/base.html" %}
+{% block title %}Register: {{ class_group.grade }} {{ class_group.name }} &middot; Kuzenga{% endblock %}
+
+{% block breadcrumbs %}{% url 'attendance:today' as breadcrumb_parent %}{% include 'components/school_breadcrumbs.html' with current=class_group parent_url=breadcrumb_parent parent_label="Attendance" %}{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-semibold mb-1">Register: {{ class_group.grade }} {{ class_group.name }}</h1>
+<p class="text-slate-500 mb-4">{{ on_date }} &middot; {{ session.get_status_display }}</p>
+<p class="text-sm text-slate-500">Late arrival threshold: {{ late_arrival_threshold_minutes }} minutes.</p>
+<form method="post">{% csrf_token %}
+<div class="overflow-x-auto" role="region" aria-label="Attendance records" tabindex="0">
+<table class="attendance-table w-full bg-white rounded-lg shadow text-sm">
+  <tbody>{% for r, status_label in record_rows %}
+    <tr class="border-b"><td class="p-3">{{ r.student.full_name }}</td>
+      <td class="p-3">{% if session.status == "open" %}<div class="attendance-controls">
+        <select name="status_{{ r.student_id }}" aria-label="Attendance status for {{ r.student.full_name }}" class="border rounded px-2 py-1">
+          {% for value, label in choices %}<option value="{{ value }}" {% if r.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+        <input name="note_{{ r.student_id }}" value="{{ r.note }}" aria-label="Attendance note for {{ r.student.full_name }}" placeholder="Note" class="border rounded px-2 py-1 ml-2">
+      </div>{% else %}{{ status_label }} {{ r.note }}{% endif %}</td></tr>
+  {% empty %}<tr><td class="p-3 text-slate-500">No learners are enrolled in this class today.</td></tr>{% endfor %}</tbody>
+</table>
+</div>
+{% if session.status == "open" %}<button class="mt-4 bg-slate-900 text-white rounded px-4 py-2">Submit register</button>{% endif %}
+</form>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "superuser/base.html" %}
+{% load images %}
+{% block title %}{{ tenant.name }} · Tenant Overview · Kuzenga{% endblock %}
+{% block content %}
+<div class="mb-6">
+  <div class="mb-2 flex items-center gap-2 text-sm text-slate-500"><a href="{% url 'superuser:tenant-directory' %}" class="hover:text-blue-800">Tenant Directory</a><span aria-hidden="true">/</span><span class="font-semibold text-[#14224a]">{{ tenant.name }}</span></div>
+  <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+    <div>{% avatar tenant.logo tenant.name "large" %}<p class="text-sm font-semibold uppercase tracking-wide text-slate-500">Tenant Overview</p><h1 class="mt-1 text-3xl font-bold tracking-tight text-[#10204a] md:text-4xl">{{ tenant.name }}</h1><p class="mt-2 text-sm text-slate-600">School code: <span class="font-semibold text-[#14224a]">{{ tenant.slug }}</span></p></div>
+    <div><span class="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold {% if tenant_status_label == 'Active' %}bg-emerald-100 text-emerald-800{% elif tenant_status_label == 'Pending' or tenant_status_label == 'Trial' %}bg-amber-100 text-amber-800{% elif tenant_status_label == 'Suspended' or tenant_status_label == 'Expired' %}bg-rose-100 text-rose-800{% else %}bg-slate-100 text-slate-700{% endif %}"><span class="h-2 w-2 rounded-full {% if tenant_status_label == 'Active' %}bg-emerald-600{% elif tenant_status_label == 'Pending' or tenant_status_label == 'Trial' %}bg-amber-600{% elif tenant_status_label == 'Suspended' or tenant_status_label == 'Expired' %}bg-rose-600{% else %}bg-slate-500{% endif %}" aria-hidden="true"></span>{{ tenant_status_label }}</span></div>
+  </div>
+</div>
+
+<section aria-label="Tenant quick actions" class="mb-6 rounded-xl border border-slate-200/80 bg-white p-4 shadow-[0_4px_18px_rgba(21,38,82,.06)] md:p-5">
+  <div class="mb-3 flex flex-col justify-between gap-2 sm:flex-row sm:items-center"><div><h2 class="text-base font-bold text-[#14224a]">Quick actions</h2><p class="mt-1 text-xs text-slate-500">Platform tools for this tenant</p></div><a href="{% url 'superuser:tenant-directory' %}" class="text-sm font-semibold text-blue-800 hover:underline">← Back to Tenant Directory</a></div>
+  <div class="flex flex-wrap gap-2">
+    <a href="{{ edit_tenant_url }}" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-[#14224a] hover:border-amber-400 hover:bg-amber-50">Edit Tenant</a>
+    <a href="{{ configure_tenant_url }}" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-[#14224a] hover:border-amber-400 hover:bg-amber-50">Configure Tenant</a>
+    <a href="{{ manage_administrators_url }}" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-[#14224a] hover:border-amber-400 hover:bg-amber-50">Manage Users & Staff</a>
+    <a href="{{ activity_url }}" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-[#14224a] hover:border-amber-400 hover:bg-amber-50">View Activity</a>
+    <a href="{{ manage_subscription_url }}" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-[#14224a] hover:border-amber-400 hover:bg-amber-50">Manage Subscription</a>
+    {% if can_suspend %}<form method="post" action="{% url 'superuser:tenant-overview-status' tenant.pk %}" onsubmit="return confirm('Suspend {{ tenant.name|escapejs }} school access?')">{% csrf_token %}<input type="hidden" name="action" value="suspend"><button type="submit" class="rounded-lg border border-rose-200 px-3 py-2 text-sm font-semibold text-rose-800 hover:bg-rose-50">Suspend Tenant</button></form>{% elif can_reactivate %}<form method="post" action="{% url 'superuser:tenant-overview-status' tenant.pk %}" onsubmit="return confirm('Reactivate {{ tenant.name|escapejs }} school access?')">{% csrf_token %}<input type="hidden" name="action" value="reactivate"><button type="submit" class="rounded-lg bg-gradient-to-r from-[#f5b51b] to-[#ee9e00] px-3 py-2 text-sm font-bold text-[#171c2d] shadow-sm hover:brightness-105">Reactivate Tenant</button></form>{% endif %}
+  </div>
+</section>
+
+<div class="mb-6 grid grid-cols-1 gap-4 xl:grid-cols-2">
+  <section class="rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_18px_rgba(21,38,82,.06)] md:p-6" aria-labelledby="tenant-identity-heading">
+    <div class="mb-5 flex items-center gap-3"><div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#14224a] text-xl font-bold text-[#f4ad16]" aria-hidden="true">{{ tenant.name|slice:":1"|upper }}</div><div><h2 id="tenant-identity-heading" class="text-lg font-bold text-[#14224a]">Tenant identity</h2><p class="text-sm text-slate-500">Registration and school details</p></div></div>
+    <dl class="divide-y divide-slate-100 text-sm">
+      <div class="flex flex-col justify-between gap-1 py-3 sm:flex-row"><dt class="text-slate-500">Tenant ID</dt><dd class="break-all font-medium text-[#14224a]">{{ tenant.pk }}</dd></div>
+      <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Registration date</dt><dd class="text-right font-medium text-[#14224a]">{{ tenant.created_at|date:"j F Y" }}</dd></div>
+      <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">School type</dt><dd class="text-right text-slate-500">Not recorded</dd></div>
+      <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Physical address</dt><dd class="text-right text-slate-500">Not recorded</dd></div>
+      <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Country</dt><dd class="text-right font-medium text-[#14224a]">{{ tenant.country|default:"Not recorded" }}</dd></div>
+      <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">School contact details</dt><dd class="text-right text-slate-500">Not recorded</dd></div>
+      <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Logo</dt><dd class="text-right text-slate-500">Not available</dd></div>
+    </dl>
+  </section>
+
+  <section class="rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_18px_rgba(21,38,82,.06)] md:p-6" aria-labelledby="administrator-heading">
+    <div class="mb-5"><h2 id="administrator-heading" class="text-lg font-bold text-[#14224a]">Primary administrator</h2><p class="text-sm text-slate-500">Active owner or administrator membership</p></div>
+    {% if primary_admin %}
+      <dl class="divide-y divide-slate-100 text-sm">
+        <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Name</dt><dd class="text-right font-semibold text-[#14224a]">{{ primary_admin.user.get_full_name|default:primary_admin.user.email }}</dd></div>
+        <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Email address</dt><dd class="break-all text-right font-medium text-[#14224a]">{{ primary_admin.user.email }}</dd></div>
+        <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Role</dt><dd class="text-right text-[#14224a]">{{ primary_admin.get_role_display }}</dd></div>
+        <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Phone</dt><dd class="text-right text-slate-500">Not recorded</dd></div>
+        <div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Account status</dt><dd class="text-right font-medium text-emerald-700">Active</dd></div>
+      </dl>
+    {% else %}<p class="rounded-lg border border-amber-100 bg-amber-50 p-4 text-sm text-amber-900">No active school owner or administrator is assigned.</p>{% endif %}
+  </section>
+
+  <section class="rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_18px_rgba(21,38,82,.06)] md:p-6" aria-labelledby="account-status-heading">
+    <div class="mb-4"><h2 id="account-status-heading" class="text-lg font-bold text-[#14224a]">Account status</h2><p class="text-sm text-slate-500">Current platform access state</p></div>
+    <div class="flex items-center gap-3 rounded-lg bg-[#f5f7fc] p-4"><span class="h-3 w-3 rounded-full {% if tenant_status_label == 'Active' %}bg-emerald-600{% elif tenant_status_label == 'Pending' or tenant_status_label == 'Trial' %}bg-amber-500{% elif tenant_status_label == 'Suspended' or tenant_status_label == 'Expired' %}bg-rose-600{% else %}bg-slate-500{% endif %}" aria-hidden="true"></span><span class="text-lg font-bold text-[#14224a]">{{ tenant_status_label }}</span></div>
+    <dl class="mt-2 divide-y divide-slate-100 text-sm"><div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Last status change</dt><dd class="text-right text-[#14224a]">{% if last_status_change %}{{ last_status_change.created_at|date:"j F Y, H:i" }}{% else %}<span class="text-slate-500">Not recorded</span>{% endif %}</dd></div>{% if last_status_change and last_status_change.actor %}<div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Changed by</dt><dd class="text-right text-[#14224a]">{{ last_status_change.actor.get_full_name|default:last_status_change.actor.email }}</dd></div>{% endif %}</dl>
+  </section>
+
+  <section id="subscription" class="rounded-xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_18px_rgba(21,38,82,.06)] md:p-6" aria-labelledby="subscription-heading">
+    <div class="mb-4"><h2 id="subscription-heading" class="text-lg font-bold text-[#14224a]">Subscription summary</h2><p class="text-sm text-slate-500">Latest recorded subscription</p></div>
+    {% if subscription %}<dl class="divide-y divide-slate-100 text-sm"><div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Plan</dt><dd class="text-right font-semibold text-[#14224a]">{{ subscription.plan.name }}</dd></div><div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Status</dt><dd class="text-right font-medium text-[#14224a]">{{ subscription.get_status_display }}</dd></div><div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Start date</dt><dd class="text-right text-[#14224a]">{% if subscription.started_at %}{{ subscription.started_at|date:"j F Y" }}{% else %}Not recorded{% endif %}</dd></div><div class="flex justify-between gap-4 py-3"><dt class="text-slate-500">Expiry date</dt><dd class="text-right text-[#14224a]">{% if subscription.current_period_end %}{{ subscription.current_period_end|date:"j F Y" }}{% else %}Not recorded{% endif %}</dd></div></dl>{% else %}<p class="rounded-lg border border-slate-200 bg-[#f5f7fc] p-4 text-sm text-slate-600">No subscription is recorded for this tenant.</p>{% endif %}
+  </section>
+</div>
+
+<section aria-label="Tenant usage statistics" class="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+  <div class="rounded-xl border border-indigo-100 bg-white p-4 shadow-[0_3px_12px_rgba(21,38,82,.06)]"><p class="text-sm text-slate-500">Total Students</p><p class="mt-2 text-3xl font-bold tabular-nums text-[#101d42]">{{ metrics.students }}</p></div>
+  <div class="rounded-xl border border-sky-100 bg-white p-4 shadow-[0_3px_12px_rgba(21,38,82,.06)]"><p class="text-sm text-slate-500">Total Teachers</p><p class="mt-2 text-3xl font-bold tabular-nums text-[#101d42]">{{ metrics.teachers }}</p></div>
+  <div class="rounded-xl border border-emerald-100 bg-white p-4 shadow-[0_3px_12px_rgba(21,38,82,.06)]"><p class="text-sm text-slate-500">School Users</p><p class="mt-2 text-3xl font-bold tabular-nums text-[#101d42]">{{ metrics.users }}</p></div>
+  <div class="rounded-xl border border-amber-100 bg-white p-4 shadow-[0_3px_12px_rgba(21,38,82,.06)]"><p class="text-sm text-slate-500">Current Classes</p><p class="mt-2 text-3xl font-bold tabular-nums text-[#101d42]">{{ metrics.classes }}</p></div>
+</section>
+
+<section id="activity" class="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-[0_4px_18px_rgba(21,38,82,.06)]" aria-labelledby="activity-heading">
+  <div class="border-b border-slate-100 px-4 py-4 md:px-5"><h2 id="activity-heading" class="text-lg font-bold text-[#14224a]">Recent activity</h2><p class="mt-1 text-sm text-slate-500">Latest recorded administrative and subscription events</p></div>
+  <div class="divide-y divide-slate-100">
+    {% for item in activity %}<div class="flex flex-col justify-between gap-1 px-4 py-3.5 sm:flex-row sm:items-center md:px-5"><div><p class="font-semibold text-[#14224a]">{{ item.action }}</p><p class="mt-1 text-xs text-slate-500">{{ item.actor }}</p></div><time class="whitespace-nowrap text-xs text-slate-500" datetime="{{ item.created_at|date:'c' }}">{{ item.created_at|date:"j M Y, H:i" }}</time></div>{% empty %}<p class="px-5 py-10 text-center text-sm text-slate-500">No tenant activity has been recorded.</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

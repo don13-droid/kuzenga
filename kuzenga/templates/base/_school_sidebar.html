@@ -1,0 +1,35 @@
+{% load images %}
+<aside class="school-sidebar" aria-label="School sidebar">
+  <a class="school-brand" href="{% url 'dashboard' %}" aria-label="Kuzenga home">
+    {% include 'components/school_logo.html' %}
+    <span>Kuzenga<small>Learn &middot; Grow &middot; Achieve</small></span>
+  </a>
+  {% if tenant %}
+    <div class="school-identity">
+      {% avatar tenant.logo tenant.name %}
+      <span>{{ tenant.name }}</span>
+    </div>
+  {% endif %}
+  <nav aria-label="School navigation">
+    {% for item in nav_items %}
+      <a href="{% url item.url %}" class="school-nav-link" {% if request.resolver_match.view_name == item.url %}aria-current="page"{% endif %}>
+        <span class="nav-symbol">{% include 'components/school_icon.html' with name=item.label %}</span>
+        <span>{{ item.label }}</span>
+        {% if item.locked %}<span class="school-nav-locked">(locked)</span>{% endif %}
+        <span class="nav-chevron" aria-hidden="true">&rsaquo;</span>
+      </a>
+    {% endfor %}
+  </nav>
+  {% if user.is_authenticated %}
+    <footer class="school-sidebar-account">
+      <p>{{ user.email }}</p>
+      <div class="school-account-actions">
+        <a href="{% url 'tenancy:select' %}">Switch school</a>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit">Sign out</button>
+        </form>
+      </div>
+    </footer>
+  {% endif %}
+</aside>

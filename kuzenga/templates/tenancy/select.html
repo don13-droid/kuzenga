@@ -1,0 +1,11 @@
+{% extends "base/base.html" %}
+{% block content %}
+<h1 class="text-xl font-semibold mb-4">Choose a school</h1>
+{% for m in memberships %}
+  <form method="post" class="mb-2">{% csrf_token %}
+    <input type="hidden" name="tenant" value="{{ m.tenant_id }}">
+    <button class="bg-white shadow rounded px-4 py-3 text-left w-full max-w-md">{{ m.tenant.name }} <span class="text-xs text-slate-500">({{ m.get_role_display }})</span></button>
+  </form>
+{% empty %}<p>You do not have access to any active school. Contact your administrator.</p>
+{% endfor %}
+{% endblock %}

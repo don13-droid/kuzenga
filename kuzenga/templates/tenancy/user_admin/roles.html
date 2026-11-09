@@ -1,0 +1,7 @@
+{% extends base_template %}
+
+{% block breadcrumbs %}{% include "components/school_breadcrumbs.html" with current="Roles & permissions" parent_url=directory_url parent_label="Users & staff" %}{% endblock %}
+{% block title %}Roles & permissions · {{ tenant.name }}{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl space-y-5"><a href="{{ directory_url }}" class="text-sm font-medium text-amber-700">← User directory</a><header><p class="text-sm text-slate-500">{{ tenant.name }}</p><h1 class="mt-1 text-2xl font-bold text-[#101d42]">Roles & permissions</h1><p class="mt-2 max-w-3xl text-sm text-slate-600">Roles use Kuzenga's shared school permission registry. Platform superuser privileges are never assignable to school accounts.</p></header><div class="grid gap-4 md:grid-cols-2">{% for role in roles %}<article class="rounded-xl border border-slate-200 bg-white p-5"><h2 class="font-bold text-[#101d42]">{{ role.label }}</h2><p class="mt-1 text-xs uppercase tracking-wide text-slate-500">{{ role.role }}</p><ul class="mt-4 space-y-2 text-sm text-slate-700">{% for permission in role.permissions %}<li class="flex gap-2"><span class="font-bold text-amber-600" aria-hidden="true">✓</span>{{ permission }}</li>{% endfor %}</ul></article>{% endfor %}</div></div>
+{% endblock %}

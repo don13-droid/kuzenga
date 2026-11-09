@@ -1,0 +1,13 @@
+{% load static %}
+<form method="post" class="bg-white rounded-lg shadow p-5 space-y-4 max-w-xl">{% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for field in form %}
+    <div>
+      <label class="block text-sm font-medium" for="{{ field.id_for_label }}">{{ field.label }}</label>
+      <div class="mt-1 [&_input:not([type=checkbox])]:w-full [&_select]:w-full [&_input:not([type=checkbox])]:border [&_select]:border [&_input]:rounded [&_select]:rounded [&_input:not([type=checkbox])]:px-3 [&_select]:px-3 [&_input:not([type=checkbox])]:py-2 [&_select]:py-2">{{ field }}</div>
+      {% if field.help_text %}<p class="text-xs text-slate-500">{{ field.help_text }}</p>{% endif %}
+      {% for e in field.errors %}<p class="text-xs text-red-700">{{ e }}</p>{% endfor %}
+    </div>
+  {% endfor %}
+  <button class="bg-slate-900 text-white rounded px-4 py-2">{{ submit_label|default:"Save" }}</button>
+</form>

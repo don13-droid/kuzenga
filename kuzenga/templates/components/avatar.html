@@ -1,0 +1,4 @@
+<span class="avatar avatar-{{ size }}" role="img" aria-label="{{ label }}">
+  <span aria-hidden="true">{{ label|slice:':1'|upper|default:'?' }}</span>
+  {% if image_url %}<img src="{{ image_url }}" alt="" loading="lazy" onerror="this.hidden=true">{% endif %}
+</span>

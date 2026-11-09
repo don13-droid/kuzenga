@@ -1,0 +1,31 @@
+{% load images %}
+<header class="school-topbar">
+  <nav class="school-topbar-navigation" aria-label="School workspace">
+    <a class="school-topbar-home" href="{% url 'dashboard' %}" aria-label="School dashboard">
+      {% include 'components/school_icon.html' with name='Dashboard' %}
+    </a>
+    <span class="school-context">{% if tenant %}{{ tenant.name }}{% else %}School workspace{% endif %}</span>
+  </nav>
+  <div class="school-profile" role="group" aria-label="Your account">
+    {% if user.is_authenticated %}
+      {% avatar user.profile_image user.full_name|default:user.email %}
+      <span class="school-profile-identity">
+        <strong>{{ user.full_name|default:user.email }}</strong>
+        <small>{% if request.membership %}{{ request.membership.get_role_display }}{% else %}School portal{% endif %}</small>
+      </span>
+      <details class="school-account-menu">
+        <summary aria-label="Account menu"><span aria-hidden="true">&#8964;</span></summary>
+        <nav class="school-account-dropdown" aria-label="Account actions">
+          <p>{{ user.email }}</p>
+          <a href="{% url 'tenancy:select' %}">Switch school</a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Sign out</button>
+          </form>
+        </nav>
+      </details>
+    {% else %}
+      <strong>Welcome to Kuzenga</strong>
+    {% endif %}
+  </div>
+</header>

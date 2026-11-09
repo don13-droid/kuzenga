@@ -1,0 +1,20 @@
+# Exact versions resolved in the current audit environment. The Docker runtime targets
+# Python 3.12; verify this set in that image/CI before release and update deliberately.
+Django==5.2.19
+Pillow==13.0.0
+asgiref==3.13.0
+sqlparse==0.6.1
+tzdata==2026.6
+djangorestframework==3.16.1
+django-environ==0.14.0
+psycopg==3.3.8
+psycopg-binary==3.3.8
+gunicorn==23.0.0
+pytest==8.4.2
+pytest-django==4.14.0
+ruff==0.17.3
+colorama==0.4.6
+iniconfig==2.3.1
+packaging==26.3
+pluggy==1.7.0
+pygments==2.21.0

@@ -1,0 +1,1 @@
+<nav aria-label="Admissions navigation" class="mb-5 flex flex-wrap gap-4 text-sm"><a class="underline" href="{% url 'admissions:dashboard' %}">Admissions dashboard</a><a class="underline" href="{% url 'admissions:list' %}">Application directory</a>{% if can_manage %}<a class="underline" href="{% url 'admissions:create' %}">New application</a>{% endif %}</nav>

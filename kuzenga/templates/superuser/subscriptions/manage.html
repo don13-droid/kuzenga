@@ -1,0 +1,37 @@
+{% extends 'superuser/base.html' %}
+{% block title %}Subscriptions · {{ tenant.name }} · Kuzenga{% endblock %}
+{% block content %}
+<a class="text-sm underline" href="{% url 'superuser:tenant-overview' tenant.pk %}">Back to {{ tenant.name }}</a>
+<h1 class="mt-4 text-2xl font-bold">Tenant Subscription Management</h1>
+<p class="mt-2 text-slate-600">{{ tenant.name }} · Manual subscription records and module access.</p>
+<div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
+  <section class="rounded-xl border border-slate-200 bg-white p-5" aria-labelledby="form-heading">
+    <h2 id="form-heading" class="mb-4 text-lg font-bold">{% if editing %}Edit subscription{% else %}Add subscription{% endif %}</h2>
+    <p class="mb-4 text-sm text-slate-600">Active and trial records grant their plan modules for the recorded dates. Other statuses revoke this record's plan grants. Independent grants and other subscriptions are preserved. No payment is processed.</p>
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}<div><label class="mb-1 block text-sm font-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<div role="alert" class="text-sm text-rose-800">{{ field.errors }}</div>{% endif %}</div>{% endfor %}
+      <button type="submit" class="platform-gold-bg rounded-lg px-4 py-2 font-bold text-[#151b2d]">Save subscription</button>
+      {% if editing %}<a class="ml-3 underline" href="{% url 'superuser:tenant-subscriptions' tenant.pk %}">Cancel editing</a>{% endif %}
+    </form>
+  </section>
+  <section class="rounded-xl border border-slate-200 bg-white p-5" aria-labelledby="access-heading">
+    <h2 id="access-heading" class="mb-4 text-lg font-bold">Current module grants</h2>
+    <p class="mb-4 text-sm text-slate-600">School status and role permissions still apply.</p>
+    <ul class="space-y-3">{% for grant in entitlements %}<li>{{ grant.module.name }} · {{ grant.get_source_display }}<span class="block text-sm text-slate-500">Expires: {{ grant.valid_until|date:'j M Y, H:i'|default:'No expiry' }}</span></li>{% empty %}<li>No current module grants.</li>{% endfor %}</ul>
+  </section>
+</div>
+<section class="mt-6 rounded-xl border border-slate-200 bg-white p-5" aria-labelledby="records-heading">
+  <h2 id="records-heading" class="mb-4 text-lg font-bold">Subscriptions</h2>
+  <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead><tr><th scope="col" class="p-3">Plan</th><th scope="col" class="p-3">Status</th><th scope="col" class="p-3">Start</th><th scope="col" class="p-3">Expiry</th><th scope="col" class="p-3">Action</th></tr></thead><tbody>
+    {% for record in subscriptions %}<tr class="border-t border-slate-100"><td class="p-3">{{ record.plan.name }}</td><td class="p-3">{{ record.get_status_display }}</td><td class="p-3">{{ record.started_at|date:'j M Y, H:i'|default:'Not recorded' }}</td><td class="p-3">{{ record.current_period_end|date:'j M Y, H:i'|default:'Not recorded' }}</td><td class="p-3"><a class="underline" href="{% url 'superuser:tenant-subscription-edit' tenant.pk record.pk %}" aria-label="Edit {{ record.plan.name }} subscription">Edit</a></td></tr>{% empty %}<tr><td colspan="5" class="p-3">No subscriptions recorded.</td></tr>{% endfor %}
+  </tbody></table></div>
+  <nav aria-label="Subscription pages" class="mt-4 flex gap-4">{% if subscriptions.has_previous %}<a href="?page={{ subscriptions.previous_page_number }}&amp;history_page={{ history.number }}">Previous</a>{% endif %}<span>Page {{ subscriptions.number }} of {{ subscriptions.paginator.num_pages }}</span>{% if subscriptions.has_next %}<a href="?page={{ subscriptions.next_page_number }}&amp;history_page={{ history.number }}">Next</a>{% endif %}</nav>
+</section>
+<section class="mt-6 rounded-xl border border-slate-200 bg-white p-5" aria-labelledby="history-heading">
+  <h2 id="history-heading" class="mb-4 text-lg font-bold">Subscription history</h2>
+  <ul class="space-y-3">{% for event in history %}<li><time datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|date:'j M Y, H:i' }}</time> · {{ event.event_type }} · {{ event.actor|default:'System' }}{% if event.detail.reason %}<p class="text-sm text-slate-600">{{ event.detail.reason }}</p>{% endif %}</li>{% empty %}<li>No history recorded.</li>{% endfor %}</ul>
+  <nav aria-label="History pages" class="mt-4 flex gap-4">{% if history.has_previous %}<a href="?history_page={{ history.previous_page_number }}&amp;page={{ subscriptions.number }}">Previous</a>{% endif %}<span>Page {{ history.number }} of {{ history.paginator.num_pages }}</span>{% if history.has_next %}<a href="?history_page={{ history.next_page_number }}&amp;page={{ subscriptions.number }}">Next</a>{% endif %}</nav>
+</section>
+{% endblock %}

@@ -1,0 +1,263 @@
+/* Shared shell geometry: wide content scrolls inside its own container. */
+* { box-sizing: border-box; }
+html, body { margin: 0; min-width: 0; }
+.school-layout, .platform-layout { min-width: 0; min-height: 100vh; }
+.school-content, .platform-content, main { min-width: 0; }
+.school-content, .platform-content > main { overflow-x: auto; }
+.school-sidebar, .platform-sidebar { min-width: 0; }
+.school-sidebar nav, .platform-sidebar nav { min-height: 0; }
+.school-sidebar { background: #031432; }
+.school-sidebar, .platform-sidebar { overflow-wrap: anywhere; }
+.student-workspace input:not([type=checkbox]):not([type=hidden]), .student-workspace select, .student-workspace textarea { display: block; width: 100%; border: 1px solid #cbd5e1; border-radius: .5rem; padding: .5rem .75rem; background: white; color: #101d42; }
+.student-workspace input:focus-visible, .student-workspace select:focus-visible, .student-workspace textarea:focus-visible { outline: 2px solid #f4ad16; outline-offset: 2px; }
+.student-workspace form p { margin-bottom: .75rem; }
+.school-sidebar nav a:focus-visible, .platform-sidebar nav a:focus-visible { outline: 2px solid #f4ad16; outline-offset: -2px; }
+.avatar { position: relative; display: inline-flex; vertical-align: middle; flex-shrink: 0; width: 2.5rem; height: 2.5rem; align-items: center; justify-content: center; overflow: hidden; border-radius: .5rem; background: #101d42; color: white; font-weight: bold; }
+.avatar-large { width: 5rem; height: 5rem; font-size: 1.5rem; }
+.avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: white; }
+.avatar img[hidden] { display: none; }
+input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea { max-width: 100%; }
+@media (min-width: 768px) {
+  .school-sidebar { position: fixed; inset: 0 auto 0 0; width: 15rem; height: 100vh; height: 100dvh; overflow-y: auto; overflow-x: hidden; }
+  .school-content { margin-left: 15rem; flex: 1; }
+  .platform-sidebar { position: fixed; inset: 0 auto 0 0; width: 16rem; height: 100vh; height: 100dvh; overflow-y: auto; overflow-x: hidden; }
+  .platform-sidebar > * { flex-shrink: 0; }
+  .platform-sidebar nav { flex: 1 0 auto; overflow: visible; }
+  .platform-content { margin-left: 16rem; flex: 1; }
+}
+@media (max-width: 767px) {
+  .platform-sidebar nav { flex-wrap: wrap; overflow: visible; }
+  .platform-sidebar nav > * { max-width: 100%; white-space: normal; }
+  .platform-content > header { flex-wrap: wrap; padding-top: .75rem; padding-bottom: .75rem; }
+}
+@media (min-width: 768px) and (max-width: 1100px) {
+  .platform-content > header { flex-wrap: wrap; padding-top: .75rem; padding-bottom: .75rem; }
+  .platform-content > header > form { flex-basis: 100%; max-width: none; }
+  .platform-content > header > div { margin-left: auto; }
+}
+/* School portal visual tokens, scoped to preserve the platform UI. */
+.school-layout { --navy:#041738; --gold:#efa909; --ink:#0b193d; --school-canvas:#f4f5fa; --school-surface:#fff; --school-border:#e7eaf3; --school-control-border:#d8deeb; --school-muted:#596780; --school-hover:#f5f7fc; --school-link:#174fa2; --school-radius:14px; --school-space-2:8px; --school-space-3:12px; --school-space-4:16px; --school-space-5:20px; --school-space-6:24px; --school-font:Georgia,"Times New Roman",serif; background:linear-gradient(135deg,#fafbfe 0%,var(--school-canvas) 65%,#f0f2f9 100%); color:var(--ink); font-family:var(--school-font); font-size:15px; -webkit-font-smoothing:antialiased}
+.school-sidebar { background:linear-gradient(160deg,#031432 0%,#04183b 55%,#02112d 100%); padding:24px 14px; color:#edf2ff}
+.school-brand { display:flex; gap:5px; align-items:center; color:#f7f8ff; font-family:Arial,Helvetica,sans-serif; font-size:28px; font-weight:750; letter-spacing:-1px; line-height:1; margin:12px 10px 40px; text-decoration:none}
+.school-brand-logo { display:block; width:54px; height:54px; flex-shrink:0}
+.school-brand small { display:block; margin-top:7px; font-size:8px; font-style:italic; letter-spacing:1px; color:#ccd6e9}
+.school-nav-link { display:flex; align-items:center; gap:12px; padding:12px 14px; margin:5px 0; border-radius:9px; color:#edf2ff; font-size:14px; text-decoration:none}
+.school-nav-link:hover { background:#ffffff18}
+.school-nav-link[aria-current=page] {
+  background: linear-gradient(115deg, #f7b719 0%, #eda80b 42%, #db9405 76%, #e9a40e 100%);
+  color: #031432;
+  font-weight: 700;
+  box-shadow: inset 0 1px 0 #ffe29a99, inset 0 -1px 0 #a86b0633, 0 4px 12px #eaa30824;
+}
+.school-nav-link[aria-current=page]:hover {
+  background: linear-gradient(115deg, #ffc63b 0%, #f5b31c 42%, #e5a00d 76%, #efb024 100%);
+}
+.school-nav-link[aria-current=page]:focus-visible {
+  outline-color: #fff0ba;
+  outline-offset: 3px;
+}
+.school-nav-locked { font-size: 11px; color: #f5c65a; }
+.school-nav-link[aria-current=page] .school-nav-locked { color: #031432; }
+.school-identity { display: flex; align-items: center; gap: 10px; margin: 0 10px 24px; color: #c4cfe3; font-size: 12px; line-height: 1.4; }
+.school-sidebar-account { margin-top: 24px; padding: 18px 10px 0; border-top: 1px solid #ffffff20; font-size: 12px; color: #c4cfe3; }
+.school-sidebar-account p { margin-bottom: 8px; }
+.school-account-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.school-account-actions :is(a,button) { display: inline-flex; align-items: center; min-height: 44px; color: #edf2ff; text-decoration: underline; text-underline-offset: 4px; }
+.school-account-actions :is(a,button):hover { color: #f5c65a; }
+.school-account-actions form { margin: 0; }
+.nav-symbol { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; flex-shrink:0; color:inherit}
+.nav-chevron { margin-left:auto; font-size:22px}
+.school-content { padding:0 28px 40px}
+.school-topbar { margin:0 -28px 24px; padding:16px 28px; min-height:78px; background:var(--school-surface); border-bottom:1px solid var(--school-border); display:flex; align-items:center; justify-content:space-between; gap:16px}
+.school-context { padding:12px 20px; border-radius:30px; background:#eef0f9; color:#5d6b88; font-size:14px}
+.school-profile { display:flex; align-items:center; gap:12px; font-size:14px}
+.school-profile small { display:block; color:#68768c; font-size:12px; margin-top:4px}
+.school-profile .avatar { width:48px; height:48px; border:2px solid #e7eaf3; border-radius:50%; background:var(--navy); font-size:18px}
+.school-profile .avatar img { object-fit:cover; }
+.school-profile-identity { max-width:240px; line-height:1.3; }
+.school-profile-identity strong { display:block; font-weight:700; }
+.school-topbar-navigation { display:flex; align-items:center; gap:12px; min-width:0; }
+.school-topbar-home { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:44px; height:44px; border-radius:50%; color:var(--ink); }
+.school-topbar-home:hover { background:var(--school-hover); }
+.school-account-menu { position:relative; flex-shrink:0; }
+.school-account-menu summary { display:flex; align-items:center; justify-content:center; width:40px; height:44px; list-style:none; cursor:pointer; border-radius:8px; font-size:22px; }
+.school-account-menu summary::-webkit-details-marker { display:none; }
+.school-account-menu summary:hover, .school-account-menu[open] summary { background:var(--school-hover); }
+.school-account-menu summary:focus-visible { outline:3px solid var(--gold); outline-offset:3px; }
+.school-account-dropdown { position:absolute; top:calc(100% + 10px); right:0; z-index:30; width:240px; max-width:calc(100vw - 32px); padding:8px; border:1px solid var(--school-border); border-radius:12px; background:var(--school-surface); box-shadow:0 8px 24px #03143218; }
+.school-account-dropdown p { padding:10px 12px; border-bottom:1px solid var(--school-border); color:var(--school-muted); font-size:12px; overflow-wrap:anywhere; }
+.school-account-dropdown :is(a,button) { display:flex; align-items:center; min-height:44px; width:100%; padding:10px 12px; border-radius:7px; text-align:left; font-size:14px; color:var(--ink); }
+.school-account-dropdown :is(a,button):hover { background:var(--school-hover); }
+.school-content .school-account-dropdown form { margin:0; padding:0; }
+.school-content .school-account-dropdown button { margin:0; font-weight:400; }
+.school-content :is(section,article,form,div,a,button).bg-white,
+.school-content :is(.metric-card,.school-panel) {
+  border: 1px solid var(--school-border);
+  border-radius: var(--school-radius);
+  box-shadow: 0 2px 4px #10254d04, 0 6px 18px #10254d06;
+}
+.school-content table { width:100%; border-collapse:collapse; font-size:14px; background:white}
+.school-content th { background:#f0f3fa; color:#56647f; text-align:left; font-size:12px}
+.school-content :is(th,td) { padding:14px 16px; border-bottom:1px solid var(--school-border)}
+.school-content tbody tr:hover { background:var(--school-hover)}
+.school-content :is(input:not([type=hidden]):not([type=checkbox]):not([type=radio]),select,textarea) { border:1px solid var(--school-control-border); border-radius:8px; padding:10px 12px; background:white; color:#0b193d}
+.school-content button { border-radius:8px; font-weight:600; cursor:pointer}
+.school-content :is(.bg-amber-400,.bg-amber-500) { background:#efa909; color:#041738}
+.school-content :is(.bg-slate-900,.bg-blue-600) { background:#041738; color:white}
+.school-layout :is(a,button,input,select,textarea):focus-visible { outline:3px solid #e4a20c; outline-offset:3px}
+.skip-link { position:fixed; top:-60px; left:16px; z-index:20; padding:12px; background:white}
+.skip-link:focus { top:12px}
+.dashboard-welcome { padding:24px 8px 34px; min-height:180px}
+.eyebrow { font-size:10px; letter-spacing:2px; color:#687795; margin-bottom:12px}
+.dashboard-welcome h1 { font:bold clamp(28px,3vw,46px) Georgia; margin:0 0 14px}
+.dashboard-welcome h1 span { color:#d99b10}
+.welcome-caption { font-size:16px; display:flex; align-items:center; gap:14px}
+.welcome-caption:before { content:''; width:64px; height:5px; border-radius:6px; background:#d99b10}
+.dashboard-date { float:right; background:white; border-radius:30px; padding:10px 16px; font-size:12px}
+.dashboard-stats { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--school-space-5); margin-bottom:var(--school-space-6)}
+.metric-card,.school-panel { background:var(--school-surface); padding:var(--school-space-6)}
+.metric-card { display:flex; align-items:center; gap:20px}
+.metric-icon { display:grid; place-items:center; border-radius:50%; width:64px; height:64px; background:#126bff; color:white; font-size:32px}
+.metric-card:nth-child(2) .metric-icon { background:#7544ce}
+.metric-card strong { font:bold 32px Georgia}
+.metric-card h2 { margin-top:4px; font-size:14px}
+.dashboard-panels { display:grid; grid-template-columns:1fr 1.1fr; gap:var(--school-space-6)}
+.school-panel h2 { font:bold 23px Georgia; margin-bottom:12px}
+.panel-caption,.quick-actions>p { color:#68768c; font-size:13px}
+.overview-metrics { display:flex; flex-wrap:wrap; gap:32px; padding:36px 0}
+.overview-metrics div { display:flex; flex-direction:column; gap:12px}
+.overview-metrics strong { border:1px solid var(--school-border); border-radius:var(--school-radius); background:#f2f6ff; color:#165bc4; width:115px; height:115px; display:grid; place-items:center; font-size:28px}
+.overview-metrics span { font-size:13px; text-align:center}
+.quick-actions { background:#041738}
+.quick-actions h2 { color:white}
+.quick-actions>p { color:#becce4}
+.quick-action-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; margin-top:20px}
+.quick-action-grid a { background:#f3f4ff; border-radius:10px; padding:14px 8px; text-align:center; font-size:12px; color:#071536; text-decoration:none}
+.quick-action-grid a:hover { background:#ffca4b}
+.quick-action-grid span { display:block; font-size:23px; margin-bottom:8px}
+@media(max-width:1100px) { .dashboard-panels { grid-template-columns:1fr}
+.school-topbar { flex-wrap:wrap}
+}
+@media(max-width:767px) { .school-sidebar { padding:12px 16px}
+.school-brand { margin:0 0 12px}
+.school-sidebar nav { display:flex; overflow-x:auto; gap:6px}
+.school-nav-link { flex-shrink:0}
+.nav-chevron { display:none}
+.school-content { padding:0 16px 24px}
+.school-topbar { margin:0 -16px 16px; padding:12px 16px}
+.dashboard-stats { grid-template-columns:1fr}
+.dashboard-date { float:none; display:inline-block; margin-bottom:16px}
+.dashboard-welcome { padding-top:8px}
+.quick-action-grid { grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* Consistent school surfaces and interaction states across existing workflows. */
+.school-icon { display: block; width: 24px; height: 24px; flex-shrink: 0; }
+.quick-action-grid .school-icon { margin: 0 auto; }
+.school-sidebar { display: flex; flex-direction: column; }
+.school-sidebar > * { flex-shrink: 0; }
+.school-sidebar nav { flex: 1 0 auto; }
+.school-content { line-height: 1.6; }
+.school-content h1 { font-family: var(--school-font); font-size: clamp(26px, 2.2vw, 34px); font-weight: 700; line-height: 1.2; letter-spacing: -.025em; text-wrap: balance; }
+.school-content h2 { font-family: var(--school-font); line-height: 1.3; letter-spacing: -.015em; }
+.school-content h3 { line-height: 1.4; }
+.school-breadcrumbs { margin: 0 0 20px; color: var(--school-muted); font-size: 13px; line-height: 1.5; }
+.school-breadcrumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; list-style: none; margin: 0; padding: 0; }
+.school-breadcrumbs li { display: inline-flex; align-items: baseline; gap: 12px; min-width: 0; overflow-wrap: anywhere; }
+.school-breadcrumbs a:hover { color: var(--school-link); text-decoration: underline; text-underline-offset: 4px; }
+.school-breadcrumbs [aria-current=page] { color: var(--ink); font-weight: 700; }
+.school-content :is(p,li,dd) { overflow-wrap: anywhere; }
+.school-content :is(label,legend) { line-height: 1.4; }
+.school-content :is(.text-slate-500,.text-slate-600) { color: var(--school-muted); }
+.school-content :is(.text-2xl,.text-3xl), .metric-card strong, .overview-metrics strong { font-variant-numeric: lining-nums tabular-nums; }
+.school-content th { font-weight: 700; letter-spacing: .025em; line-height: 1.4; }
+.school-content td { line-height: 1.5; }
+.school-content .dashboard-welcome h1 { font-size: clamp(30px, 3vw, 46px); line-height: 1.15; }
+.school-content .school-panel > h2 { font-size: clamp(20px, 1.6vw, 23px); font-weight: 700; }
+.school-content .metric-card h2 { font-size: 14px; font-weight: 400; letter-spacing: 0; line-height: 1.4; }
+.school-content .metric-card strong { line-height: 1.1; }
+.school-content .eyebrow { font-family: Arial, Helvetica, sans-serif; font-size: 10px; font-weight: 700; line-height: 1.5; letter-spacing: .15em; }
+.school-content a.bg-white:hover { border-color: #c7d3e7; background: #fafbff; }
+.school-content a.underline { color: var(--school-link); text-underline-offset: 4px; }
+.school-content :is(a,button).bg-slate-900:hover { background: #163461; }
+.school-content :is(button,input,select,textarea):disabled { cursor: not-allowed; opacity: .6; }
+.school-content input[type=checkbox], .school-content input[type=radio] { accent-color: #145cce; width: 17px; height: 17px; }
+.school-content input[type=file] { font-size: 13px; }
+.school-content input::file-selector-button { border: 0; border-radius: 5px; background: #eef2fb; color: #14325a; padding: 6px 10px; margin-right: 10px; }
+.school-content .errorlist { list-style: none; color: #a32137; background: #fff0f2; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; }
+.school-content :is(input,select,textarea)[aria-invalid=true] { border-color: #bd3b50; }
+.school-content nav:not(.school-topbar) { row-gap: 10px; }
+.school-content nav a { text-underline-offset: 4px; }
+.school-content textarea { min-height: 110px; }
+.school-content > :is(.dashboard-welcome,.dashboard-stats,.dashboard-panels) { max-width: 1600px; margin-inline: auto; }
+.school-content :is(section,article,form).bg-white { padding: var(--school-space-6); }
+.school-content :is(section,article) > h2 { margin-bottom: 16px; }
+.school-content :is(section,article) > p + :is(form,dl,ul) { margin-top: 20px; }
+.school-content form > :is(button,div:has(> button)) { margin-top: 20px; }
+.school-content td form { padding: 0; margin: 0; }
+.school-content td form > button { margin-top: 0; }
+.school-content fieldset { margin-top: 28px; padding-top: 24px; }
+.school-content dl > div { min-width: 0; }
+.school-content dt { margin-bottom: 4px; }
+.school-content form.grid { align-items: end; }
+.school-content form.grid > div { min-width: 0; }
+.school-content table { border-spacing: 0; font-variant-numeric: lining-nums tabular-nums; }
+.school-content thead th { padding-block: 15px; border-bottom-color: #dce3f0; }
+.school-content tbody tr:last-child > td { border-bottom: 0; }
+.school-content td { vertical-align: middle; }
+.school-content :is(input,select,textarea) { font: inherit; font-size: 14px; line-height: 1.5; }
+.school-content :is(input:not([type=hidden]):not([type=checkbox]):not([type=radio]),select) { min-height: 42px; }
+.school-content :is(input,select,textarea):hover:not(:disabled) { border-color: #aebdd4; }
+.school-content :is(input,select,textarea):focus-visible { border-color: #c38b0a; box-shadow: 0 0 0 3px #efad171a; }
+.school-content select { padding-right: 32px; cursor: pointer; }
+.school-content select[multiple] { padding: 10px 12px; min-height: 150px; }
+.school-content select option { background: #fff; color: #0b193d; }
+.school-content textarea[readonly] { background: #f5f7fc; }
+.school-content :is(button,a):is(.bg-slate-900,.bg-amber-400,.bg-amber-500,.bg-blue-600,.text-white) { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; border-radius: 9px; padding: 10px 18px; font-size: 14px; line-height: 1.4; text-decoration: none; }
+.school-content :is(button,a):is(.bg-amber-400,.bg-amber-500) { background: linear-gradient(115deg,#f8bb24,#e6a009); box-shadow: inset 0 1px 0 #ffe6a4aa,0 2px 4px #c58b0914; }
+.school-content :is(button,a):is(.bg-amber-400,.bg-amber-500):hover { background: linear-gradient(115deg,#ffca45,#efae1b); }
+.school-content a.underline:hover { color: #0d3675; }
+.school-content :is(button,a).border:hover:not(:disabled) { border-color: #afbdd3; }
+.school-content button:active:not(:disabled) { box-shadow: inset 0 1px 3px #03143220; }
+.school-content button.underline { min-height: 32px; }
+.school-content :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea) { min-width: 0; }
+@media (min-width: 1280px) {
+  .school-content { padding-inline: 32px; }
+  .school-topbar { margin-inline: -32px; padding-inline: 32px; }
+  .school-content .grid.gap-4 { gap: 20px; }
+  .school-content .grid.gap-5, .school-content .grid.gap-6 { gap: 24px; }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .school-content { padding-inline: 20px; }
+  .school-topbar { margin-inline: -20px; padding-inline: 20px; }
+  .school-content form.grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .metric-card { padding: 20px; gap: 12px; }
+  .metric-icon { width: 48px; height: 48px; }
+}
+.school-content .overflow-x-auto { max-width: 100%; overscroll-behavior-x: contain; }
+.school-content .overflow-x-auto:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.school-profile > span { min-width: 0; overflow-wrap: anywhere; }
+.school-context { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.metric-icon { flex-shrink: 0; }
+@media (max-width: 767px) {
+  .school-sidebar nav { flex: none; padding-bottom: 4px; }
+  .school-topbar { align-items: flex-start; }
+  .school-topbar-navigation { flex:1 1 100%; }
+  .school-profile { margin-left:auto; }
+  .school-profile { min-width: 0; overflow-wrap: anywhere; }
+  .school-content :is(th,td) { padding: 12px; }
+  .school-content :is(section,article,form).bg-white { padding: 18px; }
+  .school-content td form { padding: 0; }
+  .school-content :is(.metric-card,.school-panel) { padding: 20px; }
+  .school-content .grid-cols-2 { grid-template-columns: minmax(0,1fr); }
+  .school-content form.grid { grid-template-columns: minmax(0,1fr); }
+  .school-content header > .flex { flex-wrap: wrap; }
+  .school-content nav { flex-wrap: wrap; }
+  .school-nav-link { min-height: 44px; }
+  .school-content .attendance-controls { display: flex; flex-direction: column; gap: 10px; }
+  .school-content .attendance-controls > :is(input,select) { width: 100%; margin: 0; }
+  .school-content .attendance-table { min-width: 480px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .school-layout a, .school-layout button { transition: background-color .15s ease, border-color .15s ease; }
+}
