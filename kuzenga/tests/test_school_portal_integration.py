@@ -19,8 +19,9 @@ def test_school_login_routes_to_dashboard_and_all_navigation_links_resolve(clien
     assert dashboard.status_code == 200
     urls = {item["url"] for item in dashboard.context["nav_items"]}
     assert {"students:list", "admissions:dashboard", "academics:overview", "academics:progression"} <= urls
-    for name in urls:
-        assert client.get(reverse(name)).status_code == 200
+    for item in dashboard.context["nav_items"]:
+        # Locked modules remain visible, but entitlement enforcement must deny them.
+        assert client.get(reverse(item["url"])).status_code == (403 if item["locked"] else 200)
 
 
 def test_school_owner_and_administrator_admissions_access(client, tenant_a, admin_a):

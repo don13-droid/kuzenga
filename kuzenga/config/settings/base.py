@@ -8,7 +8,9 @@ env = environ.Env(
     DJANGO_ALLOWED_HOSTS=(list, []),
     DATABASE_URL=(str, f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
 )
-env.read_env(BASE_DIR / ".env", overwrite=False)
+# Vercel receives configuration from its environment store, never bundled dotenv.
+if not env.bool("VERCEL", default=False):
+    env.read_env(BASE_DIR / ".env", overwrite=False)
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-only-insecure-key")
 DEBUG = env.bool("DJANGO_DEBUG")
@@ -30,6 +32,8 @@ INSTALLED_APPS = [
     "apps.students",
     "apps.admissions",
     "apps.attendance",
+    "apps.assessments",
+    "apps.finance",
 ]
 
 MIDDLEWARE = [
@@ -41,6 +45,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.tenancy.middleware.TenantMiddleware",
+    "apps.core.direct_uploads.DirectUploadMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -56,6 +61,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.tenancy.context_processors.tenancy",
+                "apps.core.context_processors.uploads",
             ],
         },
     },
@@ -97,6 +103,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 PRIVATE_MEDIA_ROOT = BASE_DIR / "private-media"
+DIRECT_UPLOADS_ENABLED = env.bool("DIRECT_UPLOADS_ENABLED", default=False)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGGING = {

@@ -133,7 +133,12 @@ def student_detail(request, pk):
     activity = AuditEvent.objects.filter(tenant=request.tenant).filter(
         Q(object_type="Student", object_id=str(student.pk)) | Q(metadata__student=str(student.pk))
     ).order_by("-created_at", "-pk")
+    from apps.assessments.services import profile_results
+    from apps.finance.student_accounts import profile_summary
+
     return render(request, "students/detail.html", {
+        "academic_results": profile_results(student, request.membership),
+        "finance_summary": profile_summary(student, request.membership),
         "student": student, "enrolments": enrolments, "current_enrolment": current,
         "guardian_links": student.guardian_links.filter(tenant=request.tenant).select_related("guardian"),
         "enrol_form": forms["enrol"], "guardian_form": forms["guardian"],

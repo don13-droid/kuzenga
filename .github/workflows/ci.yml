@@ -58,6 +58,8 @@ jobs:
           cache: pip
           cache-dependency-path: |
             kuzenga/requirements/base.txt
+            kuzenga/requirements/production.txt
+            kuzenga/requirements.txt
             kuzenga/requirements/development.txt
             kuzenga/requirements/constraints.txt
 
@@ -81,3 +83,6 @@ jobs:
 
       - name: Run pytest suite
         run: python -m pytest -ra
+
+      - name: Check offline production configuration and static collection
+        run: python scripts/check_deployment.py

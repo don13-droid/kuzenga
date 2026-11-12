@@ -1,0 +1,2 @@
+# Native Vercel dependency discovery; keep versions in the existing manifests.
+-r requirements/production.txt

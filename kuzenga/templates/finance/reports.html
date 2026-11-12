@@ -1,0 +1,13 @@
+{% extends 'base/base.html' %}
+{% block title %}Financial reports · Kuzenga{% endblock %}
+{% block content %}<div class="student-workspace">
+{% include 'finance/_nav.html' %}
+{% include 'components/school_page_heading.html' with section='Live school records' heading='Financial reports' %}
+<p>Each monetary row includes its currency. Collection reports show current payment status; pending and reversed amounts are separate. Debt is as of the end date; its start date limits the invoice cohort. Trial balance shows selected-period movement, not a statutory financial statement. Audit rows have no universal currency filter.</p>
+<form method="get" class="my-5 rounded-xl border border-slate-200 bg-white p-5">{{ form.as_p }}
+<button class="school-button school-button--primary">Preview</button>
+<button class="school-button school-button--secondary" name="format" value="csv">Export CSV</button>
+<button class="school-button school-button--secondary" name="format" value="pdf">Download PDF</button></form>
+{% if not form.errors %}<p>{{ count }} report rows. Preview shows the first 100; exports include all rows, limited to 5,000 source records.</p>
+<div class="overflow-x-auto rounded-xl border border-slate-200 bg-white p-5"><table class="w-full text-left"><thead><tr>{% for cell in headers %}<th class="p-3">{{ cell }}</th>{% endfor %}</tr></thead><tbody>{% for row in rows %}<tr>{% for cell in row %}<td class="p-3">{{ cell }}</td>{% endfor %}</tr>{% empty %}<tr><td>No matching records.</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+</div>{% endblock %}

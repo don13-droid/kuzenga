@@ -1,0 +1,5 @@
+<nav class="school-pagination" aria-label="{{ pagination_label|default:'Record pages' }}">
+  {% if page.has_previous %}<a class="school-button school-button--secondary" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}{{ page_parameter|default:'page' }}={{ page.previous_page_number }}" rel="prev">Previous</a>{% endif %}
+  <span class="school-pagination-summary">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+  {% if page.has_next %}<a class="school-button school-button--secondary" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}{{ page_parameter|default:'page' }}={{ page.next_page_number }}" rel="next">Next</a>{% endif %}
+</nav>

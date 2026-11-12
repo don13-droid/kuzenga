@@ -1,0 +1,7 @@
+{% extends 'components/school_table.html' %}
+{% block table_label %}Student directory{% endblock %}
+{% block table %}
+<table class="w-full text-sm">
+<thead><tr class="border-b text-left"><th scope="col" class="p-3">Adm. no.</th><th scope="col" class="p-3">Name</th><th scope="col" class="p-3">Current class / stream</th><th scope="col" class="p-3">Status</th></tr></thead>
+<tbody id="rows">{% include "students/_rows.html" %}</tbody></table>
+{% endblock %}

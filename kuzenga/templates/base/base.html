@@ -4,23 +4,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#031432">
   <title>{% block title %}Kuzenga{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
   <link rel="stylesheet" href="{% static 'css/layout.css' %}">
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <script src="{% static 'js/school-layout.js' %}" defer></script>
+{% include 'components/direct_uploads.html' %}
 </head>
 <body class="bg-slate-50 text-slate-800">
 <a class="skip-link" href="#main-content">Skip to content</a>
 <div class="school-layout md:flex">
   {% include 'base/_school_sidebar.html' %}
-  <main class="school-content" id="main-content" tabindex="-1">
+  <div class="school-content">
     {% include 'base/_school_topbar.html' %}
-    {% for message in messages %}
-      <div role="status" class="mb-4 rounded px-4 py-2 {% if message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">{{ message }}</div>
-    {% endfor %}
-    {% block breadcrumbs %}{% endblock %}
-    {% block content %}{% endblock %}
-  </main>
+    {% include 'components/school_confirmation.html' %}
+    {% include 'components/school_loading.html' %}
+    <main class="school-page-container" id="main-content" tabindex="-1">
+      {% include 'components/school_notifications.html' %}
+      {% block breadcrumbs %}{% endblock %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
 </div>
 </body>
 </html>

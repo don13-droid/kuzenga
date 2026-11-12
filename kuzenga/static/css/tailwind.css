@@ -643,11 +643,6 @@ video {
   margin-right: auto;
 }
 
-.my-4 {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
 .mb-1 {
   margin-bottom: 0.25rem;
 }
@@ -714,10 +709,6 @@ video {
 
 .mt-6 {
   margin-top: 1.5rem;
-}
-
-.mt-8 {
-  margin-top: 2rem;
 }
 
 .block {
@@ -1320,19 +1311,9 @@ video {
   background-color: rgb(5 150 105 / var(--tw-bg-opacity, 1));
 }
 
-.bg-green-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(220 252 231 / var(--tw-bg-opacity, 1));
-}
-
 .bg-indigo-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(238 242 255 / var(--tw-bg-opacity, 1));
-}
-
-.bg-red-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1));
 }
 
 .bg-red-50 {
@@ -1748,11 +1729,6 @@ video {
   color: rgb(244 173 22 / var(--tw-text-opacity, 1));
 }
 
-.text-amber-300 {
-  --tw-text-opacity: 1;
-  color: rgb(252 211 77 / var(--tw-text-opacity, 1));
-}
-
 .text-amber-600 {
   --tw-text-opacity: 1;
   color: rgb(217 119 6 / var(--tw-text-opacity, 1));
@@ -1798,11 +1774,6 @@ video {
   color: rgb(6 78 59 / var(--tw-text-opacity, 1));
 }
 
-.text-green-800 {
-  --tw-text-opacity: 1;
-  color: rgb(22 101 52 / var(--tw-text-opacity, 1));
-}
-
 .text-indigo-800 {
   --tw-text-opacity: 1;
   color: rgb(55 48 163 / var(--tw-text-opacity, 1));
@@ -1841,11 +1812,6 @@ video {
 .text-sky-900 {
   --tw-text-opacity: 1;
   color: rgb(12 74 110 / var(--tw-text-opacity, 1));
-}
-
-.text-slate-100 {
-  --tw-text-opacity: 1;
-  color: rgb(241 245 249 / var(--tw-text-opacity, 1));
 }
 
 .text-slate-300 {
@@ -2056,11 +2022,6 @@ video {
   background-color: rgb(248 250 252 / var(--tw-bg-opacity, 1));
 }
 
-.hover\:bg-slate-700:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(51 65 85 / var(--tw-bg-opacity, 1));
-}
-
 .hover\:bg-white\/10:hover {
   background-color: rgb(255 255 255 / 0.1);
 }
@@ -2197,10 +2158,6 @@ video {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .md\:grid-cols-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
   .md\:grid-cols-\[1fr_190px_190px_auto_auto\] {
     grid-template-columns: 1fr 190px 190px auto auto;
   }
@@ -2334,48 +2291,4 @@ video {
   .xl\:p-8 {
     padding: 2rem;
   }
-}
-
-.\[\&_input\:not\(\[type\=checkbox\]\)\]\:w-full input:not([type=checkbox]) {
-  width: 100%;
-}
-
-.\[\&_input\:not\(\[type\=checkbox\]\)\]\:border input:not([type=checkbox]) {
-  border-width: 1px;
-}
-
-.\[\&_input\:not\(\[type\=checkbox\]\)\]\:px-3 input:not([type=checkbox]) {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-
-.\[\&_input\:not\(\[type\=checkbox\]\)\]\:py-2 input:not([type=checkbox]) {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.\[\&_input\]\:rounded input {
-  border-radius: 0.25rem;
-}
-
-.\[\&_select\]\:w-full select {
-  width: 100%;
-}
-
-.\[\&_select\]\:rounded select {
-  border-radius: 0.25rem;
-}
-
-.\[\&_select\]\:border select {
-  border-width: 1px;
-}
-
-.\[\&_select\]\:px-3 select {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-
-.\[\&_select\]\:py-2 select {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
 }

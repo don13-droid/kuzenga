@@ -4,10 +4,10 @@
 {% block breadcrumbs %}{% include 'components/school_breadcrumbs.html' with current="Student directory" %}{% endblock %}
 {% block content %}
 <div class="student-workspace">
-<div class="mb-4 flex flex-wrap items-center justify-between gap-3"><h1 class="text-2xl font-semibold">Learners</h1>{% if can_manage %}<a href="{% url 'students:create' %}" class="rounded-lg bg-amber-400 px-4 py-2 font-semibold text-slate-900">Add learner</a>{% endif %}</div>
-<form method="get" class="mb-5 grid gap-3 rounded-xl border border-slate-200 bg-white p-4 md:grid-cols-2">
-{% include 'students/_fields.html' with form=filters %}<div><button class="rounded bg-slate-900 px-4 py-2 text-white">Filter students</button> <a class="ml-3 underline" href="{% url 'students:list' %}">Clear</a></div>
-</form>
+{% if can_manage %}{% url 'students:create' as heading_action_url %}{% endif %}
+{% include 'components/school_page_heading.html' with section='Student Management' heading='Student directory' description="Find learners and manage their school records." action_url=heading_action_url action_label='Add learner' action_icon='Students' %}
+{% url 'students:list' as filter_clear_url %}
+{% include 'components/school_filter_bar.html' with filters=filters clear_url=filter_clear_url filter_label='Filter students' %}
 {% include 'students/_directory_results.html' %}
 </div>
 {% endblock %}

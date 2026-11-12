@@ -1,0 +1,7 @@
+{% for message in messages %}
+  <div class="school-notification{% if message.level >= 40 %} school-notification--error{% elif message.level >= 30 %} school-notification--warning{% elif message.level >= 25 %} school-notification--success{% endif %}" role="{% if message.level >= 40 %}alert{% else %}status{% endif %}">
+    <span class="school-notification-icon" aria-hidden="true">{% if message.level >= 40 %}!{% elif message.level >= 30 %}!{% elif message.level >= 25 %}&#10003;{% else %}i{% endif %}</span>
+    <span>{{ message }}</span>
+  </div>
+{% endfor %}
+<div id="school-request-error" class="school-notification school-notification--error" role="alert" hidden></div>

@@ -2,11 +2,13 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 
+from apps.core.direct_uploads import grant
 from apps.core.media_views import image
 from apps.core.views import PlatformLoginView, PortalLoginView, dashboard, health
 from apps.tenancy import user_admin_views
 
 urlpatterns = [
+    path("uploads/grant/", grant, name="direct-upload-grant"),
     path("media/<path:path>", image, name="protected-image"),
     path("admin/", admin.site.urls),
     path("health/", health, name="health"),
@@ -32,4 +34,6 @@ urlpatterns = [
     path("students/", include("apps.students.urls")),
     path("admissions/", include("apps.admissions.urls")),
     path("attendance/", include("apps.attendance.urls")),
+    path("assessments/", include("apps.assessments.urls")),
+    path("finance/", include("apps.finance.urls")),
 ]

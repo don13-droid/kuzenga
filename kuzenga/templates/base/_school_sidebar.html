@@ -1,5 +1,5 @@
 {% load images %}
-<aside class="school-sidebar" aria-label="School sidebar">
+<aside class="school-sidebar" id="school-sidebar" aria-label="School sidebar">
   <a class="school-brand" href="{% url 'dashboard' %}" aria-label="Kuzenga home">
     {% include 'components/school_logo.html' %}
     <span>Kuzenga<small>Learn &middot; Grow &middot; Achieve</small></span>
@@ -10,9 +10,10 @@
       <span>{{ tenant.name }}</span>
     </div>
   {% endif %}
-  <nav aria-label="School navigation">
+  <nav aria-label="School navigation" tabindex="0">
     {% for item in nav_items %}
-      <a href="{% url item.url %}" class="school-nav-link" {% if request.resolver_match.view_name == item.url %}aria-current="page"{% endif %}>
+      {% url item.url as navigation_url %}
+      <a href="{{ navigation_url }}" class="school-nav-link" {% if request.path == navigation_url %}aria-current="page"{% elif navigation_url != '/' and navigation_url in request.path %}aria-current="location"{% endif %}>
         <span class="nav-symbol">{% include 'components/school_icon.html' with name=item.label %}</span>
         <span>{{ item.label }}</span>
         {% if item.locked %}<span class="school-nav-locked">(locked)</span>{% endif %}

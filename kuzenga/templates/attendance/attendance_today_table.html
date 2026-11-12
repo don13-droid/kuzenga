@@ -1,0 +1,12 @@
+{% extends 'components/school_table.html' %}
+{% block table_label %}Attendance records{% endblock %}
+{% block table %}
+<table class="attendance-table w-full bg-white rounded-lg shadow text-sm">
+  <thead><tr><th scope="col">Class</th><th scope="col">Register status</th><th scope="col">Action</th></tr></thead>
+  <tbody>{% for c, s in rows %}
+    <tr class="border-b"><td class="p-3">{{ c.grade }} {{ c.name }}</td>
+      <td class="p-3">{% if s %}{% include 'components/school_status_badge.html' with label=s.get_status_display only %}{% else %}{% include 'components/school_status_badge.html' with label='Not started' only %}{% endif %}</td>
+      <td class="p-3 text-right"><a class="underline" href="{% url 'attendance:register' c.pk %}">{% if s and s.status == "submitted" %}View{% else %}Take register{% endif %}</a></td></tr>
+  {% empty %}<tr><td colspan="3" class="p-3 text-slate-500">{% include 'components/school_empty_state.html' with message="No classes in a current academic year. Mark an academic year as current in Academic setup." only %}</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

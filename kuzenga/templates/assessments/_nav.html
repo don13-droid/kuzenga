@@ -1,0 +1,10 @@
+<nav class="mb-5 flex flex-wrap gap-3" aria-label="Assessment navigation">
+<a class="school-button school-button--secondary" href="{% url 'assessments:index' %}">Assessments</a>
+<a class="school-button school-button--secondary" href="{% url 'assessments:examinations' %}">Examinations</a>
+<a class="school-button school-button--secondary" href="{% url 'assessments:results' %}">Published results</a>
+<a class="school-button school-button--secondary" href="{% url 'assessments:analytics' %}">Performance analytics</a>
+<a class="school-button school-button--primary" href="{% url 'assessments:create' %}">New assessment</a>
+<a class="school-button school-button--secondary" href="{% url 'assessments:policy' %}">New policy</a>
+<a class="school-button school-button--secondary" href="{% url 'assessments:configuration' 'categories' %}">Assessment categories</a>
+<a class="school-button school-button--secondary" href="{% url 'assessments:configuration' 'grades' %}">Grade boundaries</a>
+</nav>

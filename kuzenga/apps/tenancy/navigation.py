@@ -1,6 +1,8 @@
 """Sidebar is generated from entitlements + permissions (never a hard-coded list per school)."""
 
 NAV_ITEMS = [
+    {"label": "Finance", "url": "finance:overview", "module": "finance", "permission": "finance.view"},
+    {"label": "Assessments & results", "url": "assessments:index", "module": "assessments", "permission": "assessments.view"},
     {"label": "Dashboard", "url": "dashboard", "module": None, "permission": None},
     {"label": "Users & staff", "url": "tenancy:users", "module": None, "permission": "users.view"},
     {

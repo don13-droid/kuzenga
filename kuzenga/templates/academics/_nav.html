@@ -1,1 +1,5 @@
-<nav aria-label="Academic navigation" class="mb-5 flex flex-wrap gap-3 text-sm"><a class="underline" href="{% url 'academics:overview' %}">Academic dashboard</a>{% for kind, label in academic_navigation %}<a class="underline" href="{% url 'academics:list' kind %}">{{ label }}</a>{% endfor %}{% if can_manage %}<a class="underline" href="{% url 'academics:progression' %}">Student progression</a>{% endif %}</nav>
+{% extends 'components/school_tabs.html' %}
+{% block tabs_label %}Academic navigation{% endblock %}
+{% block tabs %}
+{% url 'academics:overview' as module_navigation_url %}<a class="underline" href="{{ module_navigation_url }}" {% if request.path == module_navigation_url %}aria-current="page"{% endif %}>Academic dashboard</a>{% for kind, label in academic_navigation %}{% url 'academics:list' kind as module_navigation_url %}<a class="underline" href="{{ module_navigation_url }}" {% if request.path == module_navigation_url %}aria-current="page"{% endif %}>{{ label }}</a>{% endfor %}{% if can_manage %}{% url 'academics:progression' as module_navigation_url %}<a class="underline" href="{{ module_navigation_url }}" {% if request.path == module_navigation_url %}aria-current="page"{% endif %}>Student progression</a>{% endif %}
+{% endblock %}

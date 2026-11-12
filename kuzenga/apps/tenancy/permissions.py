@@ -7,6 +7,8 @@ ALL = "*"
 ROLE_PERMISSIONS: dict[str, set[str]] = {
     Role.OWNER: {ALL},
     Role.ADMIN: {
+        "finance.view", "finance.configure", "finance.approve", "finance.fees",
+        "assessments.view", "assessments.manage", "assessments.review",
         "academics.view",
         "academics.manage",
         "students.view",
@@ -21,13 +23,14 @@ ROLE_PERMISSIONS: dict[str, set[str]] = {
         "users.manage",
     },
     Role.TEACHER: {
+        "assessments.view", "assessments.manage",
         "academics.view",
         "students.view",
         "attendance.view",
         "attendance.take_register",
     },
-    Role.HOD: {"academics.view", "students.view", "attendance.view", "attendance.take_register"},
-    Role.BURSAR: {"students.view"},
+    Role.HOD: {"academics.view", "students.view", "attendance.view", "attendance.take_register", "assessments.view", "assessments.manage", "assessments.review"},
+    Role.BURSAR: {"students.view", "finance.view", "finance.post", "finance.fees"},
     Role.STAFF: set(),
     Role.GUARDIAN: set(),
     Role.STUDENT: set(),

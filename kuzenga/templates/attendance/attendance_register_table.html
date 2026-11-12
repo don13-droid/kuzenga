@@ -1,0 +1,16 @@
+{% extends 'components/school_table.html' %}
+{% block table_label %}Attendance records{% endblock %}
+{% block table %}
+<table class="attendance-table w-full bg-white rounded-lg shadow text-sm">
+  <thead><tr><th scope="col">Learner</th><th scope="col">Attendance and note</th></tr></thead>
+  <tbody>{% for r, status_label in record_rows %}
+    <tr class="border-b"><td class="p-3">{{ r.student.full_name }}</td>
+      <td class="p-3">{% if session.status == "open" %}<div class="attendance-controls">
+        <select name="status_{{ r.student_id }}" aria-label="Attendance status for {{ r.student.full_name }}" class="border rounded px-2 py-1">
+          {% for value, label in choices %}<option value="{{ value }}" {% if r.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+        <input name="note_{{ r.student_id }}" value="{{ r.note }}" aria-label="Attendance note for {{ r.student.full_name }}" placeholder="Note" class="border rounded px-2 py-1 ml-2">
+      </div>{% else %}{{ status_label }} {{ r.note }}{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="2" class="p-3 text-slate-500">{% include 'components/school_empty_state.html' with message="No learners are enrolled in this class today." only %}</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

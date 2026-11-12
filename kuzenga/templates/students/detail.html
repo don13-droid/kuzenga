@@ -6,9 +6,10 @@
 {% block content %}
 <div class="student-workspace">
 <a href="{% url 'students:list' %}" class="text-sm underline">Back to students</a>
-<div class="my-4 flex flex-wrap items-center gap-4">{% avatar student.profile_image student.full_name "large" %}{% if can_manage %}<a class="underline" href="{% url 'students:edit' student.pk %}">Edit student</a>{% endif %}</div>
-<h1 class="text-2xl font-semibold">{{ student.full_name }}</h1>
-<p class="text-slate-500 mb-6">Admission no. {{ student.admission_number }} &middot; {{ student.get_status_display }}</p>
+<a href="{% url 'assessments:student-results' student.pk %}" class="school-button school-button--secondary">Academic results & report cards</a>
+{% include 'assessments/_student_results.html' %}
+{% include 'finance/_student_summary.html' %}
+<header class="school-page-heading school-student-heading"><div class="school-profile-summary">{% avatar student.profile_image student.full_name "large" %}<div><p class="school-section-label">Student record</p><h1>{{ student.full_name }}</h1><p class="school-page-description">Admission no. {{ student.admission_number }} &middot; {% include 'components/school_status_badge.html' with label=student.get_status_display only %}</p></div></div>{% if can_manage %}<a class="school-button school-button--primary rounded-lg bg-amber-400 px-4 py-2 font-semibold text-slate-900" href="{% url 'students:edit' student.pk %}">Edit student</a>{% endif %}</header>
 <section class="mb-5 rounded-xl border border-slate-200 bg-white p-5" aria-label="Personal and enrolment details">
 <dl class="grid gap-3 md:grid-cols-2"><div><dt class="text-sm text-slate-500">Preferred name</dt><dd>{{ student.preferred_name|default:'Not recorded' }}</dd></div><div><dt class="text-sm text-slate-500">Date of birth</dt><dd>{{ student.date_of_birth|date:'j F Y'|default:'Not recorded' }}</dd></div><div><dt class="text-sm text-slate-500">Gender</dt><dd>{{ student.get_gender_display|default:'Not recorded' }}</dd></div><div><dt class="text-sm text-slate-500">Current class and stream</dt><dd>{{ current_enrolment.class_group|default:'Not assigned' }}</dd></div></dl>
 </section>
@@ -17,27 +18,27 @@
     <h2 class="font-semibold mb-2">Class history</h2>
     <ul class="text-sm space-y-1">{% for e in enrolments %}
       <li>{{ e.class_group.grade }} {{ e.class_group.name }} &mdash; {{ e.effective_from }} to {{ e.effective_to|default:"present" }}</li>
-    {% empty %}<li class="text-slate-500">Not enrolled in a class.</li>{% endfor %}</ul>
+    {% empty %}<li class="text-slate-500">{% include 'components/school_empty_state.html' with message="Not enrolled in a class." only %}</li>{% endfor %}</ul>
     {% if can_manage %}
     <form method="post" class="mt-4 space-y-2">{% csrf_token %}<input type="hidden" name="action" value="enrol">
-      {{ enrol_form.as_p }}<button class="bg-slate-900 text-white rounded px-3 py-1 text-sm">Enrol / move</button></form>{% endif %}
+      {% include 'components/form_fields.html' with form=enrol_form %}<button class="school-button school-button--secondary">Enrol / move</button></form>{% endif %}
   </section>
   <section class="bg-white rounded-lg shadow p-4">
     <h2 class="font-semibold mb-2">Guardians</h2>
     <ul class="text-sm space-y-1">{% for l in guardian_links %}
-      <li>{{ l.guardian }} {% if l.relationship %}({{ l.relationship }}){% endif %} {{ l.guardian.phone }} {{ l.guardian.email }}{% if l.is_emergency %} <b>emergency contact</b>{% endif %}{% if l.can_collect %} ? authorised to collect{% endif %}{% if l.is_primary %} <b>primary</b>{% endif %}</li>
-    {% empty %}<li class="text-slate-500">No guardians recorded.</li>{% endfor %}</ul>
+      <li>{{ l.guardian }} {% if l.relationship %}({{ l.relationship }}){% endif %} {{ l.guardian.phone }} {{ l.guardian.email }}{% if l.is_emergency %} <b>emergency contact</b>{% endif %}{% if l.can_collect %} &middot; authorised to collect{% endif %}{% if l.is_primary %} <b>primary</b>{% endif %}</li>
+    {% empty %}<li class="text-slate-500">{% include 'components/school_empty_state.html' with message="No guardians recorded." only %}</li>{% endfor %}</ul>
     {% if can_manage %}
     <form method="post" class="mt-4 space-y-2">{% csrf_token %}<input type="hidden" name="action" value="guardian">
-      {{ guardian_form.as_p }}<button class="bg-slate-900 text-white rounded px-3 py-1 text-sm">Add guardian</button></form>{% endif %}
+      {% include 'components/form_fields.html' with form=guardian_form %}<button class="school-button school-button--secondary">Add guardian</button></form>{% endif %}
   </section>
 </div>
 {% if can_manage %}
 <div class="mt-6 grid gap-6 md:grid-cols-2">
-<section class="rounded-xl border border-slate-200 bg-white p-5"><h2 class="mb-3 font-semibold">Student status</h2><p class="mb-3 text-sm text-slate-500">Transfer, withdrawal, graduation and archival close open enrolments. Reactivation preserves history; assign a class separately.</p><form method="post">{% csrf_token %}<input type="hidden" name="action" value="status">{% include 'students/_fields.html' with form=status_form %}<button class="rounded bg-slate-900 px-3 py-2 text-sm text-white">Update status</button></form></section>
-<section class="rounded-xl border border-slate-200 bg-white p-5"><h2 class="mb-3 font-semibold">Private documents</h2><ul class="mb-4 space-y-2">{% for document in documents %}<li><a class="underline" href="{% url 'students:document-download' student.pk document.pk %}">{{ document.title }}</a> <time class="text-xs text-slate-500">{{ document.created_at|date:'j M Y' }}</time></li>{% empty %}<li>No documents recorded.</li>{% endfor %}</ul><p class="mb-3 text-sm text-slate-500">PDF up to 10 MB; JPEG, PNG or WebP up to 5 MB. Accessible to school owners and administrators.</p><form method="post" enctype="multipart/form-data">{% csrf_token %}<input type="hidden" name="action" value="document">{% include 'students/_fields.html' with form=document_form %}<button class="rounded bg-slate-900 px-3 py-2 text-sm text-white">Upload document</button></form></section>
+<section class="rounded-xl border border-slate-200 bg-white p-5"><h2 class="mb-3 font-semibold">Student status</h2><p class="mb-3 text-sm text-slate-500">Transfer, withdrawal, graduation and archival close open enrolments. Reactivation preserves history; assign a class separately.</p><form data-school-confirm="Confirm this student status change?" method="post">{% csrf_token %}<input type="hidden" name="action" value="status">{% include 'students/_fields.html' with form=status_form %}<button class="school-button school-button--secondary">Update status</button></form></section>
+<section class="rounded-xl border border-slate-200 bg-white p-5"><h2 class="mb-3 font-semibold">Private documents</h2><ul class="mb-4 space-y-2">{% for document in documents %}<li><a class="underline" href="{% url 'students:document-download' student.pk document.pk %}">{{ document.title }}</a> <time class="text-xs text-slate-500">{{ document.created_at|date:'j M Y' }}</time></li>{% empty %}<li>{% include 'components/school_empty_state.html' with message="No documents recorded." only %}</li>{% endfor %}</ul><p class="mb-3 text-sm text-slate-500">PDF up to 10 MB; JPEG, PNG or WebP up to 5 MB. Accessible to school owners and administrators.</p><form method="post" enctype="multipart/form-data">{% csrf_token %}<input type="hidden" name="action" value="document">{% include 'students/_fields.html' with form=document_form %}<button class="school-button school-button--secondary">Upload document</button></form></section>
 </div>
 {% endif %}
-<section class="mt-6 rounded-xl border border-slate-200 bg-white p-5"><h2 class="mb-3 font-semibold">Student activity</h2><ul class="space-y-2">{% for event in activity %}<li><time datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|date:'j M Y, H:i' }}</time> ? {{ event.description }}</li>{% empty %}<li>No activity recorded.</li>{% endfor %}</ul><nav aria-label="Student activity pages" class="mt-4 flex gap-3">{% if activity.has_previous %}<a class="underline" href="?activity_page={{ activity.previous_page_number }}">Previous</a>{% endif %}<span>Page {{ activity.number }} of {{ activity.paginator.num_pages }}</span>{% if activity.has_next %}<a class="underline" href="?activity_page={{ activity.next_page_number }}">Next</a>{% endif %}</nav></section>
+<section class="mt-6 rounded-xl border border-slate-200 bg-white p-5"><h2 class="mb-3 font-semibold">Student activity</h2><ul class="space-y-2">{% for event in activity %}<li><time datetime="{{ event.created_at|date:'c' }}">{{ event.created_at|date:'j M Y, H:i' }}</time> &middot; {{ event.description }}</li>{% empty %}<li>{% include 'components/school_empty_state.html' with message="No activity recorded." only %}</li>{% endfor %}</ul>{% include 'components/school_pagination.html' with page=activity pagination_label='Student activity pages' page_parameter='activity_page' filter_query='' only %}</section>
 </div>
 {% endblock %}

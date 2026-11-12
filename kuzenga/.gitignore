@@ -12,6 +12,7 @@ __pycache__/
 .env
 .env.*
 !.env.example
+!.env.production.example
 
 # Database files
 *.sqlite3
@@ -43,3 +44,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Vercel local account/project metadata
+.vercel/
