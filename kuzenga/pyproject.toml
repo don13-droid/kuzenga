@@ -11,3 +11,6 @@ exclude = ["migrations"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "DJ"]
 ignore = ["DJ001", "DJ008", "DJ012", "E501"]
+
+[tool.vercel]
+entrypoint = "config.wsgi:application"

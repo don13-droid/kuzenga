@@ -1,0 +1,3 @@
+-r requirements/production.txt
+-c requirements/constraints.txt
+django-storages[s3]>=1.14.6,<1.15

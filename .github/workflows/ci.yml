@@ -81,3 +81,29 @@ jobs:
 
       - name: Run pytest suite
         run: python -m pytest -ra
+
+      - name: Verify Vercel build configuration and compile Tailwind
+        run: |
+          python -m json.tool vercel.json > /dev/null
+          npx --yes tailwindcss@3.4.17 --input tailwind.input.css --output static/css/tailwind.css --minify
+          test -s static/css/tailwind.css
+
+      - name: Check Vercel dependencies and settings
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.vercel
+          VERCEL_ENV: preview
+          KUZENGA_RESOURCE_ENV: preview
+          DATABASE_URL: postgresql://ci:ci@ci-pooler.example.invalid/kuzenga?sslmode=require
+          KUZENGA_POOLED_DATABASE_HOST: ci-pooler.example.invalid
+          DJANGO_SECRET_KEY: ci-only-kuzenga-vercel-settings-validation-do-not-deploy
+          DJANGO_ALLOWED_HOSTS: kuzenga-preview.example.invalid
+          KUZENGA_STORAGE_ENDPOINT: https://s3.example.invalid
+          KUZENGA_STORAGE_BUCKET: kuzenga-ci-preview
+          KUZENGA_STORAGE_ACCESS_KEY_ID: ci-only
+          KUZENGA_STORAGE_SECRET_ACCESS_KEY: ci-only
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip check
+          python -c 'from config.wsgi import application; assert callable(application)'
+          python manage.py check --deploy --fail-level ERROR
+          python manage.py collectstatic --noinput

@@ -1,0 +1,4 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npx --yes tailwindcss@3.4.17 --input tailwind.input.css --output static/css/tailwind.css --minify"
+}
