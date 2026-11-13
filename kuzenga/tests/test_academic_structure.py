@@ -4,7 +4,7 @@ from io import StringIO
 import pytest
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.management import call_command
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, connection, transaction
 from django.urls import reverse
 from django.utils import timezone
 
@@ -309,7 +309,8 @@ def test_dashboard_and_class_curriculum_rendering(client, tenant_a, admin_a, tea
     assert client.get(reverse("academics:progression")).status_code == 403
 
 
-@pytest.mark.django_db
+# SQLite needs constraint toggles outside atomic; PostgreSQL avoids guard-blocked flush.
+@pytest.mark.django_db(transaction=connection.vendor == "sqlite")
 def test_migration_does_not_rebuild_existing_tables():
     output = StringIO()
     call_command("sqlmigrate", "academics", "0004", stdout=output)
