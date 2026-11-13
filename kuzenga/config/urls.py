@@ -4,10 +4,13 @@ from django.urls import include, path
 
 from apps.core.direct_uploads import grant
 from apps.core.media_views import image
+from apps.core.public_views import home
 from apps.core.views import PlatformLoginView, PortalLoginView, dashboard, health
 from apps.tenancy import user_admin_views
 
 urlpatterns = [
+    path("", home, name="corporate-home"),
+    path("elevon/", home, name="corporate-alias"),
     path("uploads/grant/", grant, name="direct-upload-grant"),
     path("media/<path:path>", image, name="protected-image"),
     path("admin/", admin.site.urls),
@@ -27,7 +30,7 @@ urlpatterns = [
         user_admin_views.reset_tenant_member_password_view,
         name="tenant-user-password-reset-confirm",
     ),
-    path("", dashboard, name="dashboard"),
+    path("dashboard/", dashboard, name="dashboard"),
     path("school/", include("apps.tenancy.urls")),
     path("platform/", include("apps.tenancy.superuser_urls")),
     path("academics/", include("apps.academics.urls")),

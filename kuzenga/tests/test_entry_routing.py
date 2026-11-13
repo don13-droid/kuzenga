@@ -6,12 +6,12 @@ User = get_user_model()
 
 
 @pytest.mark.django_db
-def test_anonymous_root_redirects_to_login(client):
+def test_anonymous_root_opens_corporate_home(client):
     response = client.get("/")
 
-    assert response.status_code == 302
-    assert response.url == reverse("login")
-    assert client.get(response.url).status_code == 200
+    assert response.status_code == 200
+    assert b"Elevating Ideas." in response.content
+    assert reverse("login").encode() in response.content
 
 
 @pytest.mark.django_db
@@ -19,7 +19,7 @@ def test_platform_superuser_root_opens_tenant_directory_without_loop(client):
     superuser = User.objects.create_superuser("platform-entry@example.test", "Unused-password-1!")
     client.force_login(superuser)
 
-    response = client.get("/")
+    response = client.get(reverse("dashboard"))
 
     assert response.status_code == 302
     assert response.url == reverse("superuser:tenant-directory")
@@ -30,7 +30,7 @@ def test_platform_superuser_root_opens_tenant_directory_without_loop(client):
 def test_school_administrator_root_opens_school_dashboard(client, admin_a):
     client.force_login(admin_a)
 
-    response = client.get("/")
+    response = client.get(reverse("dashboard"))
 
     assert response.status_code == 200
     assert b"Welcome" in response.content
@@ -43,7 +43,7 @@ def test_school_administrator_login_and_logout_keep_working(client, admin_a):
     )
 
     assert login.status_code == 302
-    assert login.url == "/"
+    assert login.url == reverse("dashboard")
     assert client.get(login.url).status_code == 200
 
     logout = client.post(reverse("logout"))
@@ -85,7 +85,7 @@ def test_authenticated_user_without_tenant_context_goes_to_tenant_selection(clie
     user = User.objects.create_user("unassigned-entry@example.test", "Unused-password-1!")
     client.force_login(user)
 
-    response = client.get("/")
+    response = client.get(reverse("dashboard"))
 
     assert response.status_code == 302
     assert response.url == reverse("tenancy:select")

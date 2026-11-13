@@ -14,7 +14,7 @@ pytestmark = pytest.mark.django_db
 
 def test_school_login_routes_to_dashboard_and_all_navigation_links_resolve(client, admin_a):
     response = client.post(reverse("login"), {"username": admin_a.email, "password": "pass12345!"})
-    assert response.status_code == 302 and response.url == "/"
+    assert response.status_code == 302 and response.url == reverse("dashboard")
     dashboard = client.get(response.url)
     assert dashboard.status_code == 200
     urls = {item["url"] for item in dashboard.context["nav_items"]}

@@ -148,3 +148,17 @@ class AuditEvent(models.Model):
 
     def __str__(self):
         return f"{self.created_at}: {self.action}"
+
+
+class DemoEnquiry(models.Model):
+    """Platform-owned leads, never exposed through school querysets or public reads."""
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(max_length=120)
+    organisation = models.CharField(max_length=200)
+    email = models.EmailField(max_length=254)
+    phone = models.CharField(max_length=40)
+    enrolment = models.PositiveIntegerField()
+    plan = models.CharField(max_length=20)
+    message = models.TextField(max_length=4000)
+    consent = models.BooleanField()

@@ -424,3 +424,15 @@ input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textare
 .school-notification--success { border-color:#c5e5d9; background:var(--school-success-surface); color:var(--school-success); }
 .school-notification--error { border-color:#edc9d0; background:var(--school-error-surface); color:var(--school-error); }
 .school-notification--warning { border-color:#ecd6a0; background:var(--school-warning-surface); color:var(--school-warning); }
+/* Mobile navigation is a modal drawer; desktop geometry stays in the shared shell. */
+.school-sidebar-overlay[hidden], .school-sidebar-close[hidden] { display: none; }
+.school-sidebar-overlay { position: fixed; inset: 0; z-index: 70; background: #061b3899; }
+.school-sidebar-close { margin: 12px; padding: 10px 14px; color: white; border: 1px solid currentColor; border-radius: 6px; background: transparent; align-self: flex-end; }
+@media (max-width: 767px) {
+  body.school-drawer-open { overflow: hidden; }
+  .school-sidebar { position: fixed; inset: 0 auto 0 0; z-index: 80; width: min(19rem, 88vw); height: 100vh; height: 100dvh; overflow-y: auto; overscroll-behavior: contain; animation: school-drawer-enter .2s ease-out; }
+  .school-sidebar nav { flex: 1 0 auto; }
+  .school-sidebar nav a { white-space: normal; }
+}
+@keyframes school-drawer-enter { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { .school-sidebar { animation: none; } }

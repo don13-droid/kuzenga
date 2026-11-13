@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AuditEvent
+from .models import AuditEvent, DemoEnquiry
 
 
 class TenantScopedAdmin(admin.ModelAdmin):
@@ -27,6 +27,27 @@ class AuditEventAdmin(admin.ModelAdmin):
 
     def has_view_permission(self, request, obj=None):
         return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(DemoEnquiry)
+class DemoEnquiryAdmin(admin.ModelAdmin):
+    list_display = ("created_at", "organisation", "plan", "enrolment")
+    readonly_fields = [field.name for field in DemoEnquiry._meta.fields]
+
+    def has_module_permission(self, request):
+        return request.user.is_active and request.user.is_superuser
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_active and request.user.is_superuser
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
 
     def has_delete_permission(self, request, obj=None):
         return False
