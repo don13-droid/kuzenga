@@ -6,6 +6,7 @@ from django.core import signing
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
@@ -41,9 +42,13 @@ def home(request):
                 except (SMTPException, OSError):
                     logger.warning('Demo enquiry saved; email notification unavailable')
                 return redirect(reverse('corporate-home') + '?sent=1#contact')
-    return render(request, 'public/home.html', {
+    try:
+        return render(request, 'public/home.html', {
         'form': form, 'sent': request.GET.get('sent') == '1',
         'enquiry_token': signing.dumps('demo', salt='demo-enquiry'),
         'bands': BANDS, 'addons': ADDONS, 'features': FEATURES,
         'pricing': {'bands': BANDS, 'addons': ADDONS},
-    }, status=status)
+        }, status=status)
+    except (TemplateDoesNotExist, TemplateSyntaxError) as exc:
+        logger.error('Preview homepage template failure: %s: %s', type(exc).__name__, str(exc)[:600])
+        raise
