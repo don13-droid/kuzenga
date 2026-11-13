@@ -13,7 +13,10 @@ and [audit/release checklist](../../docs/operations/vercel-deployment.md).
 Select the existing repository with **Root Directory `kuzenga`**, native **Django**
 framework and Python **3.12** (`.python-version`). `requirements.txt` includes the
 existing production requirements/constraints; it is not a second dependency list.
-`tool.vercel.entrypoint` pins `config.wsgi:application`. `vercel.json` sets production
+Native Django discovery selects `config/asgi.py` because both `ASGI_APPLICATION`
+and `WSGI_APPLICATION` exist; this takes precedence over the WSGI entrypoint hint.
+`vercel.json` applies template inclusion and private-file exclusions to both existing
+entrypoints. `vercel.json` sets production
 entrypoint options, excludes local data from the function and disables **all automatic Git
 deployments**. This is a source safeguard, not proof of remote account controls.
 The current owner request approves the protected preview; automatic Git deployments remain disabled.
@@ -179,3 +182,64 @@ retention and an operational owner, then rehearse restore into isolated targets.
 - [Vercel payload limits](https://vercel.com/docs/functions/limitations)
 - [Neon Django configuration](https://neon.com/docs/guides/django)
 - [django-storages S3 options](https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html)
+
+## Verified protected preview — 2026-11-13
+
+Owner-requested preview repairs are on `fix/preview-foundation-20261113`,
+reviewable in [PR 1](https://github.com/don13-droid/kuzenga/pull/1). Production,
+DNS and main were not changed.
+
+Confirmed defects were stale exact-host configuration, template rules attached
+only to WSGI while the native runtime selected ASGI, an outdated preview schema,
+and PostgreSQL test teardown attempting to truncate immutable finance tables.
+Exact Vercel system hosts are now validated and allowed; both entrypoint rules
+bundle templates and retain private-file exclusions. Nontransactional tests use
+rollback isolation and execute image-deletion callbacks; SQLite schema inspection
+retains its required non-atomic setup. Finance guards are unchanged.
+
+The existing Neon preview project `snowy-leaf-13797514` / branch
+`br-noisy-fire-beogzk6k` was snapshotted as
+`snap-morning-frog-be0uqcr4` before a controlled direct-connection upgrade.
+All 23 pending migrations succeeded, including finance through 0019, assessments,
+attendance and the enquiry table. No migrations run at build or request time.
+Existing tenant/user/student counts were unchanged. This is not a production
+restore rehearsal.
+
+The deployed code checkpoint `de061f7` passed GitHub CI on Python 3.12 /
+PostgreSQL 16. The earlier executable full SQLite regression passed **425 tests,
+1 PostgreSQL-only skip**; PostgreSQL CI reported **424 passed, 2 skipped**.
+Ruff, Django checks, migration consistency and offline production/static checks
+passed. Live homepage, school login, platform login and DB-aware health returned
+200. Build-time read-only checks passed for the configured Neon database and
+existing Cloudflare R2 preview bucket.
+
+Use the existing stable alias:
+`https://kuzenga-preview-donewells-projects.vercel.app`.
+Vercel protection remains enabled. Share links are temporary; application login
+and tenant authorization remain required for protected school functions.
+
+### Remaining upload configuration
+
+Unsigned R2 preflight returned 403 with “CORS not configured for this bucket”.
+Existing bucket credentials can authenticate but cannot read/manage bucket CORS.
+The guarded operator command `scripts/configure_preview_cors.py` refused the
+operation; it is not part of the normal build or application startup.
+The Cloudflare owner must add this rule to **kuzenga-preview** through its dashboard,
+preserving any existing rules:
+
+```json
+[{
+  "AllowedOrigins": ["https://kuzenga-preview-donewells-projects.vercel.app"],
+  "AllowedMethods": ["PUT"],
+  "AllowedHeaders": ["content-type"],
+  "MaxAgeSeconds": 3600
+}]
+```
+
+Do not add wildcard origins or broaden the app token. Recheck browser preflight and
+authenticated image/document upload after this is saved. Random deployment URLs
+are intentionally outside this upload rule; use the stable alias. No live-school
+workflow or full upload acceptance is claimed by page-load checks.
+
+Guidance consulted: root AGENTS.md, global rules 00–10, tenant and academics
+module rules, ADR-0002, and the existing deployment and finance acceptance notes.
