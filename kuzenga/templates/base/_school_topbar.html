@@ -1,6 +1,10 @@
 {% load images %}
 <header class="school-topbar">
   <nav class="school-topbar-navigation" aria-label="School workspace">
+    <button class="school-sidebar-toggle" type="button" aria-controls="school-sidebar" aria-expanded="true" hidden>
+      <svg class="school-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <span>Menu</span>
+    </button>
     <a class="school-topbar-home" href="{% url 'dashboard' %}" aria-label="School dashboard">
       {% include 'components/school_icon.html' with name='Dashboard' %}
     </a>

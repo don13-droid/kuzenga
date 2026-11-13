@@ -1,7 +1,9 @@
 {% extends "base/base.html" %}
+{% block title %}Access restricted &middot; Kuzenga{% endblock %}
 {% block content %}
-<div class="max-w-lg bg-white rounded-lg shadow p-6">
-  <h1 class="text-xl font-semibold mb-2">You do not have permission to do that</h1>
+<div class="school-access-panel max-w-lg bg-white rounded-lg shadow p-6">
+  {% include 'components/school_page_heading.html' with section="School administration" heading="You do not have permission to do that" %}
   <p class="text-slate-600">Ask your school administrator if you need access.</p>
+  <a class="school-button school-button--secondary mt-5" href="{% url 'dashboard' %}">Return to dashboard</a>
 </div>
 {% endblock %}

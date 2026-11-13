@@ -1,0 +1,7 @@
+<form method="get" class="school-filter-bar bg-white">
+  <div class="school-filter-fields">{% include 'components/form_fields.html' with form=filters %}</div>
+  <div class="school-filter-actions">
+    <button class="school-button school-button--secondary rounded bg-slate-900 px-4 py-2 text-white">{{ filter_label|default:'Filter' }}</button>
+    <a class="school-button school-button--secondary" href="{{ clear_url }}">Clear</a>
+  </div>
+</form>

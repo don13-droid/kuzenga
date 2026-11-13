@@ -1,3 +1,10 @@
-{{ form.non_field_errors }}
-{% for field in form.hidden_fields %}{{ field }}{{ field.errors }}{% endfor %}
-{% for field in form.visible_fields %}<div class="mb-4"><label class="mb-1 block text-sm font-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<p class="mt-1 text-xs text-slate-500">{{ field.help_text }}</p>{% endif %}{% for error in field.errors %}<p role="alert" class="text-sm text-rose-800">{{ error }}</p>{% endfor %}</div>{% endfor %}
+{% if form.non_field_errors %}<div class="school-form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+{% for field in form.hidden_fields %}{{ field }}{% if field.errors %}<div class="school-form-errors" role="alert">{{ field.errors }}</div>{% endif %}{% endfor %}
+{% for field in form.visible_fields %}
+  <div class="school-field{% if field.errors %} school-field--invalid{% endif %}{% if field.field.widget.input_type == 'checkbox' %} school-field--checkbox{% endif %}">
+    <label class="school-field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.help_text %}<p class="school-field-help"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text }}</p>{% endif %}
+    {% if field.errors %}<div class="school-field-errors" role="alert">{{ field.errors }}</div>{% endif %}
+  </div>
+{% endfor %}

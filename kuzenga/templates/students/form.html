@@ -5,10 +5,10 @@
 {% block content %}
 <div class="student-workspace mx-auto max-w-3xl">
 <a class="text-sm underline" href="{% if student %}{% url 'students:detail' student.pk %}{% else %}{% url 'students:list' %}{% endif %}">Back to students</a>
-<h1 class="my-4 text-2xl font-semibold">{{ title }}</h1>
+{% include 'components/school_page_heading.html' with section='Student Management' heading=title %}
 <form method="post" enctype="multipart/form-data" class="rounded-xl border border-slate-200 bg-white p-5">
 {% csrf_token %}{% include 'students/_fields.html' %}
 {% if guardian_form %}<fieldset class="mt-6 border-t border-slate-200 pt-4"><legend class="font-bold">Guardian and emergency contact (optional)</legend><p class="mb-4 text-sm text-slate-500">Choose an existing guardian or enter new contact details.</p>{% include 'students/_fields.html' with form=guardian_form %}</fieldset>{% endif %}
-<button class="platform-gold-bg rounded-lg bg-amber-400 px-4 py-2 font-semibold text-slate-900">Save student</button>
+<div class="school-form-actions"><button class="school-button school-button--primary rounded-lg bg-amber-400 px-4 py-2 font-semibold text-slate-900">Save student</button><a class="school-button school-button--secondary" href="{% if student %}{% url 'students:detail' student.pk %}{% else %}{% url 'students:list' %}{% endif %}">Cancel</a></div>
 </form></div>
 {% endblock %}

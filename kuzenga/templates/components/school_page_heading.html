@@ -1,0 +1,9 @@
+<header class="school-page-heading">
+  <div>{% if section %}<p class="school-section-label">{{ section }}</p>{% endif %}<h1>{{ heading }}</h1>{% if description %}<p class="school-page-description">{{ description }}</p>{% endif %}</div>
+  {% if action_url and action_label %}
+    <a class="school-button school-button--primary" href="{{ action_url }}">
+      {% if action_icon %}{% include 'components/school_icon.html' with name=action_icon only %}{% endif %}
+      {{ action_label }}
+    </a>
+  {% endif %}
+</header>

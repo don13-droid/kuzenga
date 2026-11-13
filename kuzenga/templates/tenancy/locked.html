@@ -1,8 +1,12 @@
 {% extends "base/base.html" %}
+{% block title %}Module unavailable &middot; Kuzenga{% endblock %}
 {% block content %}
-<div class="max-w-lg bg-white rounded-lg shadow p-6">
-  <h1 class="text-xl font-semibold mb-2">{{ module.name|default:code }} is not included in your plan</h1>
+<div class="school-access-panel max-w-lg bg-white rounded-lg shadow p-6">
+  {% with module_heading=module.name|default:code|add:" is not included in your plan" %}
+  {% include 'components/school_page_heading.html' with section="School administration" heading=module_heading %}
+  {% endwith %}
   <p class="text-slate-600">{{ module.description }}</p>
   <p class="mt-4 text-sm">Contact Kuzenga to add this module to your subscription.</p>
+  <a class="school-button school-button--secondary mt-5" href="{% url 'dashboard' %}">Return to dashboard</a>
 </div>
 {% endblock %}

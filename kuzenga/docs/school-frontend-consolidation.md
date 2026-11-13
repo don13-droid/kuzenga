@@ -180,3 +180,255 @@ routes and live page labels. Shared staff pages supply breadcrumbs only when the
 school base renders that block; the platform base is unchanged. Older module
 pages now have document titles matching their existing single page heading.
 No backend files or form contracts changed. Browser verification remains pending.
+
+### Shared responsive content container
+
+The school base now wraps messages, breadcrumbs and page content in
+`.school-page-container`: full available width up to 1600px, centered, with
+shrinkable children. Existing school gutters remain 32px on wide desktops,
+28px normally, 20px on tablets and 16px on mobile. Narrow form-specific maximum
+widths are preserved. The topbar remains outside this content width constraint.
+No routes, form fields, backend or platform markup changed. Browser verification
+at desktop/tablet/mobile widths remains pending.
+
+### Consistent navigation states
+
+Shared sidebar links now distinguish exact current pages (`aria-current=page`)
+from ancestor sections (`aria-current=location`), retaining gold styling through
+detail and edit screens. Parent and child entries can both indicate location.
+Academic and admissions subnavigation now share pill spacing, hover states and
+exact current-page styling. Existing URL generation, permissions and locked
+module access remain unchanged. Templates/CSS only; browser verification pending.
+
+### Mobile sidebar toggle
+
+The shared topbar exposes a Menu button below 768px. A deferred school-only
+script controls the sidebar's hidden state and aria-expanded value, closes it on
+Escape or navigation, returns focus to the toggle and restores desktop navigation
+when crossing the breakpoint. Without JavaScript the sidebar remains visible.
+No backend or platform changes. JavaScript syntax checked with `node --check
+kuzenga/static/js/school-layout.js`; browser interaction testing remains pending.
+
+### Scrollable small-screen navigation
+
+The expanded mobile sidebar now uses a vertical navigation list bounded to 55%
+of viewport height (with vh fallback), independent vertical scrolling, stable
+scrollbar space and contained scroll gestures. The nav is keyboard-focusable
+with visible focus, and chevrons remain visible. Desktop retains its scrollable
+full-height sidebar. Existing links, toggle and access conditions are unchanged.
+Checked CSS breakpoint/overflow declarations; browser scrolling verification is
+still pending.
+
+### School-wide inheritance audit
+
+Audited 29 school/client full-page templates: all extend `base/base.html` or the
+existing portal-selected `base_template`. School login, selection, access states,
+activation and password reset are included. Shared staff templates retain platform
+inheritance when used by platform views. Student enrolment/guardian forms and the
+complete form helper now reuse `components/form_fields.html`; the school student
+save button no longer references a platform-specific class. Field names, actions,
+prefixes, CSRF and server validation are preserved. School-wide control widths
+and border tokens also apply to legacy account forms. No Python changed.
+Consulted global rules 00-10, frontend rule 03, tenant/authentication/student and
+adjacent module rules, and ADR-0001. Visual browser verification remains pending.
+
+### Dashboard module refinement
+
+Reformatted the school dashboard into readable semantic sections with the
+reference's welcome hierarchy, live metric cards and navy quick-action panel.
+Class counts use a class icon. School Overview displays existing school metadata
+and the current membership role rather than repeating totals or inventing
+performance percentages. Quick actions retain permission-filtered routes and
+explicit plan labels. No new queries, Python changes, mock data or photo assets.
+Browser/reference fidelity verification remains pending.
+
+### Student Management refinement
+
+Directory, create/edit and profile templates now use shared heading, description,
+status and form-action styles. Directory scrolling is named and keyboard
+accessible; status pills preserve the original status labels. Profile identity
+and edit action share one responsive header. Save/cancel actions retain existing
+routes, and guardian, placement, status, document and history markup keeps its
+original fields and permission conditions. Replaced literal question-mark
+separators in the profile. No Python or HTMX response contracts changed.
+Browser/reference comparison remains pending.
+
+### Admissions & Enrolment refinement
+
+Dashboard, directory, create/edit and enrolment confirmation use a reusable page
+heading component. Application details use the shared responsive action header;
+status labels use shared neutral badges, and the directory has a named keyboard
+scroll region. Form action bars preserve save-draft and submit button semantics,
+with existing-route cancel links. Review transitions, reasons, concurrency values,
+uploads, enrolment, pagination and permission conditions remain unchanged.
+Templates only; browser/reference comparison remains pending.
+
+### Academic Management refinement
+
+Overview, create/edit, progression and class detail pages reuse the shared page
+heading component. Directories use consistent action headers and named,
+keyboard-focusable scroll regions. Save/progression actions share the form action
+bar and existing-route cancel links. Corrected literal question-mark separators
+and missing-value display text. Preserved academic fields, concurrency values,
+filters, pagination, deactivation actions, placement modes and permission checks.
+No Python changed. Browser/reference comparison remains pending.
+
+### Teachers and Staff refinement
+
+Existing Users & Staff pages retain the shared portal-selected base. School
+headers and neutral status badges follow the school design system, while platform
+header classes remain conditional. Directory role/status selects now have
+accessible names; table scrolling and pagination have labels. Profile, form and
+role cards inherit the existing shared school styles. No teacher/staff domain
+features were added, and primary-owner/shared-identity protections, activation,
+reset, role and status actions are unchanged. Templates only; browser comparison
+remains pending.
+
+### Attendance refinement
+
+Daily class list and register now reuse shared headings, status badges and form
+actions. Tables have explicit column headings and correct empty-state spans,
+retaining named scroll regions. Register submission retains its exact field
+names, configured status choices, CSRF and open/submitted conditions. Added the
+existing attendance-list route as a return action. Templates only; backend and
+register services unchanged. Browser/reference comparison remains pending.
+
+### School administration refinement
+
+School selection uses the shared heading component and selectable card treatment;
+roles/permissions carries a school administration heading without changing the
+platform variant. Selection, locked-module and forbidden pages now have explicit
+document titles and inherit the same school surfaces and typography. Existing
+school user administration remains intact. General school configuration/settings
+routes are currently platform-only; no school configuration route or permission
+was introduced. Templates/CSS only; browser comparison remains pending.
+
+### Remaining school-facing account and access pages
+
+School sign-in, activation and password reset now use the reusable school heading
+component and accessible error announcements. Sign-in controls include standard
+autocomplete attributes. Account completion announces its result; access panels
+have consistent centering and an existing dashboard return link. All retain the
+school base, original fields, CSRF, validation and token workflows. Platform login
+is unchanged. No Python changes. Finance and Reports have no implemented school
+pages and were not invented. Browser/reference comparison remains pending.
+
+### Reusable dashboard KPI cards
+
+`components/school_kpi_card.html` standardizes the dashboard card shell, label,
+value and existing SVG icon. Callers pass explicit context with `only`; no data
+fetching, invented metrics or fallback numbers are added. Dashboard continues to
+iterate the original server-provided `stats`, preserving zero values and empty
+states. Existing shared metric styles provide responsive sizing and typography.
+No backend changes; browser comparison remains pending.
+
+### Reusable data-table pattern
+
+Five school tables now extend `components/school_table.html` through module-owned
+partials. The shared component owns the named keyboard-scroll region, border,
+radius and shadow; each module retains its exact table columns, rows, actions and
+empty text. Student `rows` target and rows-only HTMX response are intact. Staff
+directory adopts the same container style only in school context, retaining its
+platform layout. Shared CSS standardizes headings, cells and empty-state padding.
+No Python changes; browser verification remains pending.
+
+### Reusable search/filter bars
+
+Student, admissions and academic directories now include
+`components/school_filter_bar.html`, which reuses existing field rendering and
+GET submission with caller-supplied clear URL/button text. All query field names,
+choices, initial values, errors and hidden inputs remain server-rendered.
+Two-column fields collapse to one on mobile, with a consistent action row.
+Staff filters retain their shared manual fields and platform behavior, adopting
+the school filter surface in school context. Pagination queries are unchanged.
+Templates/CSS only; browser verification remains pending.
+
+### Primary and secondary buttons
+
+Added explicit school button variants: metallic gold primary actions and white,
+navy-text bordered secondary actions, with shared sizing, focus, hover and
+disabled states. Existing school action elements retain their original element
+types, names, values, URLs and permission conditions. Shared staff templates opt
+in conditionally for school context. Filter and clear controls use the shared
+variants. Backend unchanged; browser verification pending.
+
+### Form inputs and validation errors
+
+The shared field component now provides consistent labels, help text, field and
+non-field error announcements, invalid borders and checkbox spacing. Widgets,
+required/disabled attributes, values and hidden fields remain Django-rendered;
+validation text is unchanged. Help-text IDs match Django's standard widget
+references. Activation and password-reset pages reuse the same component.
+School CSS defines consistent input sizing and validation states; no backend
+validation or authentication behavior changed. Browser verification pending.
+
+### Reusable status badges
+
+`components/school_status_badge.html` now renders existing student, admissions,
+attendance and school staff status labels through one shared pill style. Exact
+labels and attendance not-started conditions are retained. Neutral navy/grey
+styling avoids inventing status classifications or relying on color alone; long
+labels wrap on small screens. Platform staff status rendering stays plain as
+before. No status transitions, Python or permissions changed. Browser verification
+remains pending.
+
+### Reusable navigation tabs
+
+Academic and admissions navigation now extend `components/school_tabs.html`.
+Existing links, current-page attributes and permission conditions are retained.
+The shared tab surface has consistent sizing, focus and horizontal scrolling on
+small screens. These are page-navigation links, so native nav/link semantics are
+preserved rather than adding ARIA tab roles for nonexistent in-page panels.
+No backend or unfinished module links added. Browser verification pending.
+
+### Reusable empty states
+
+Existing literal loop-empty messages now use `school_empty_state.html` for
+consistent muted text, spacing and responsive wrapping. Their original table
+cells/colspans and list elements remain intact; no records, no filter matches and
+no active modules retain distinct original wording. Staff directory adopts the
+component only in school context. No invented records or automatic actions.
+Templates/CSS only; browser verification pending.
+
+### Reusable pagination
+
+Student directory/activity, admissions directory/history, academic directory/class
+roster and school staff directory use `school_pagination.html`. The component
+accepts the existing page object, label, query and page parameter. Original
+page/activity_page/history_page parameters and previous/next visibility remain;
+filter strings stay escaped and pagination page sizes/order remain server-owned.
+Staff platform pagination is retained verbatim. Styling uses existing secondary
+buttons and wrapping spacing. No backend changes; browser verification pending.
+
+### Loading indicators
+
+The school base includes a reusable polite loading status with a restrained gold
+spinner. Native form submissions show feedback after confirmation handlers accept
+the event; controls remain enabled so submitter names/values are preserved. HTMX
+requests use beforeRequest/afterRequest and failure/abort lifecycle events with
+concurrent-request tracking. BFCache restoration clears stale feedback; native
+navigation feedback also clears after 30 seconds. Reduced motion uses a static
+indicator. No routes or HTMX swap behavior changed. `node --check` passed;
+browser interaction verification remains pending.
+
+### Success and error notifications
+
+The school base now reuses `school_notifications.html`. Django message text is
+preserved; standard numeric message levels determine restrained success, warning,
+error and information treatment, so extra tags do not break severity styling.
+Errors announce as alerts; other messages use status semantics. Failed school
+HTMX requests display a safe static message without server response bodies or
+automatic retries. No delivery/success is claimed for a failed request.
+JavaScript syntax check passed. Backend/platform behavior unchanged; browser
+interaction verification remains pending.
+
+### Cross-module consistency pass
+
+Reviewed existing school page headings, action variants, navigation, controls,
+tables and feedback against shared components. Student forms now reuse the page
+heading include; academic class/allocation states reuse status badges; cancel and
+attendance return actions use secondary button styling. All 72 templates compile.
+School modules retain one school base and scoped design tokens; platform templates
+remain separate. This is implementation consistency evidence, not completed
+browser/reference verification. Module 09 backend remains at its documented Phase 1
+checkpoint and is not represented as a completed attendance feature set.

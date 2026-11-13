@@ -1,0 +1,55 @@
+from django.urls import path
+
+from . import control_views as control
+from . import dashboard_views, report_views, views
+from . import operation_views as operations
+from . import workflow_views as core
+
+app_name = "finance"
+urlpatterns = [
+    path("reconciliation/<uuid:pk>/release/", operations.match_release, name="match-release"),
+    path("reports/", report_views.reports, name="reports"),
+    path("allocations/<uuid:pk>/retract/", core.allocation_retract, name="allocation-retract"),
+    path("cash-up/", operations.cashups, name="cashups"),
+    path("cash-up/new/", operations.cash_open, name="cash-open"),
+    path("cash-up/<uuid:pk>/count/", operations.cash_count, name="cash-count"),
+    path("cash-up/<uuid:pk>/review/", operations.cash_review, name="cash-review"),
+    path("imports/", operations.imports, name="imports"),
+    path("imports/new/", operations.import_new, name="import-new"),
+    path("imports/<uuid:pk>/", operations.import_detail, name="import"),
+    path("imports/<uuid:pk>/review/", operations.import_review, name="import-review"),
+    path("reconciliation/", operations.reconciliation, name="reconciliation"),
+    path("reconciliation/new/", operations.match_new, name="match-new"),
+    path("reconciliation/<uuid:pk>/review/", operations.match_review, name="match-review"),
+    path("controls/", control.requests, name="controls"),
+    path("controls/new/", control.request_create, name="control-create"),
+    path("controls/<uuid:pk>/", control.detail, name="control"),
+    path("controls/<uuid:pk>/decide/", control.decide, name="control-decide"),
+    path("controls/<uuid:pk>/disburse/", control.disburse, name="control-disburse"),
+    path("controls/<uuid:pk>/reverse/", control.reverse, name="control-reverse"),
+    path("billing/", core.billing, name="billing"),
+    path("invoices/", core.invoices, name="invoices"),
+    path("invoices/<uuid:pk>/", core.invoice_detail, name="invoice"),
+    path("payments/", core.payments, name="payments"),
+    path("payments/new/", core.payment_create, name="payment-create"),
+    path("payments/<uuid:pk>/", core.payment_detail, name="payment"),
+    path("payments/<uuid:pk>/reverse/", core.payment_reverse, name="payment-reverse"),
+    path("receipts/", core.receipts, name="receipts"),
+    path("receipts/<uuid:pk>/", core.receipt_detail, name="receipt"),
+    path("receipts/<uuid:pk>/print.pdf", core.receipt_pdf, name="receipt-pdf"),
+    path("debt/", core.debt, name="debt"),
+    path("arrangements/new/", core.arrangement, name="arrangement"),
+    path("follow-ups/new/", core.followup, name="followup"),
+    path("collections/", core.collections, name="collections"),
+    path("", dashboard_views.overview, name="overview"),
+    path("accounts/", views.chart, name="chart"),
+    path("students/", views.student_accounts, name="student-accounts"),
+    path("students/<uuid:pk>/", views.student_statement, name="student-statement"),
+    path("fees/", views.fees, name="fees"),
+    path("fees/new/", views.fee_create, name="fee-create"),
+    path("settings/<slug:kind>/", views.configuration, name="configuration"),
+    path("journals/new/", views.post, name="post"),
+    path("journals/<uuid:pk>/", views.journal, name="journal"),
+    path("ledger/", views.ledger, name="ledger"),
+    path("audit/", views.activity, name="activity"),
+]

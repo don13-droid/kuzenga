@@ -50,6 +50,11 @@ Compose starts PostgreSQL and the Django development server, waits for PostgreSQ
 
 ## Configuration
 
+For the approved preparatory Vercel/Neon configuration, private external storage,
+environment variables, offline checks and controlled preview migrations, see
+[deployment preparation](docs/deployment.md). Deployment remains subject to
+separate explicit owner approval.
+
 The authoritative Django project and settings are under this `kuzenga/` directory. `backend/` at the repository root is retained as a temporary infrastructure reference and must not receive product features or be run as a competing backend.
 
 | Variable | Purpose |

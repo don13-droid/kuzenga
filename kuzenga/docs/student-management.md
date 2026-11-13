@@ -79,6 +79,12 @@ the existing `actor=None` convention only within explicit `tenant_context`.
 
 ## Private student documents
 
+Deployment preparation now supports a private external storage alias while
+preserving the existing download routes and migration import path. Local storage
+remains the default outside the configured S3 production runtime. See
+[deployment preparation](deployment.md) for the environment contract and the
+unresolved Vercel upload-size incompatibility. No files have been transferred.
+
 `StudentDocument` extends `TenantScopedModel`. Its files use
 `PRIVATE_MEDIA_ROOT`, defaulting to `kuzenga/private-media/`, outside `MEDIA_ROOT`.
 This directory is ignored by Git. Files use generated names rather than uploaded

@@ -1,0 +1,10 @@
+# Workspace deployment tools and local data must never enter release source.
+.deployment-tools/
+.vercel/
+**/.vercel/
+*.sqlite3
+.env
+.env.*
+!.env.example
+!.env.production.example
+**/__pycache__/

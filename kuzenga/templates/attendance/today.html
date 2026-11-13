@@ -3,15 +3,7 @@
 
 {% block breadcrumbs %}{% include 'components/school_breadcrumbs.html' with current="Attendance" %}{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-semibold mb-1">Attendance</h1>
+{% include 'components/school_page_heading.html' with section="Attendance" heading="Daily attendance" description="Review class registers for the current academic year." %}
 <p class="text-slate-500 mb-4">{{ on_date }} &middot; classes in the current academic year</p>
-<div class="overflow-x-auto" role="region" aria-label="Attendance records" tabindex="0">
-<table class="attendance-table w-full bg-white rounded-lg shadow text-sm">
-  <tbody>{% for c, s in rows %}
-    <tr class="border-b"><td class="p-3">{{ c.grade }} {{ c.name }}</td>
-      <td class="p-3">{% if s %}{{ s.get_status_display }}{% else %}Not started{% endif %}</td>
-      <td class="p-3 text-right"><a class="underline" href="{% url 'attendance:register' c.pk %}">{% if s and s.status == "submitted" %}View{% else %}Take register{% endif %}</a></td></tr>
-  {% empty %}<tr><td class="p-3 text-slate-500">No classes in a current academic year. Mark an academic year as current in Academic setup.</td></tr>{% endfor %}</tbody>
-</table>
-</div>
+{% include 'attendance/attendance_today_table.html' %}
 {% endblock %}

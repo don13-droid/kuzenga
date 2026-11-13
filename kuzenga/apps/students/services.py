@@ -71,6 +71,8 @@ def enrol_student(student, class_group, *, effective_from=None, actor=None, requ
     enrolment = StudentEnrolment.objects.create(
         student=student, class_group=class_group, effective_from=effective_from
     )
+    from apps.finance.student_accounts import account_for_enrolment
+    account_for_enrolment(enrolment, actor)
     audit.record(
         "student.enrolled",
         actor=actor,

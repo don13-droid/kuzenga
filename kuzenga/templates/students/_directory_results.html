@@ -1,9 +1,3 @@
 <div id="student-directory-results">
-<div class="overflow-x-auto rounded-xl border border-slate-200 bg-white"><table class="w-full text-sm">
-<thead><tr class="border-b text-left"><th scope="col" class="p-3">Adm. no.</th><th scope="col" class="p-3">Name</th><th scope="col" class="p-3">Current class / stream</th><th scope="col" class="p-3">Status</th></tr></thead>
-<tbody id="rows">{% include "students/_rows.html" %}</tbody></table></div>
-<nav aria-label="Student pages" class="mt-4 flex flex-wrap gap-3 text-sm">
-{% if page.has_previous %}<a class="underline" href="?{{ filter_query }}&amp;page={{ page.previous_page_number }}">Previous</a>{% endif %}
-<span>Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
-{% if page.has_next %}<a class="underline" href="?{{ filter_query }}&amp;page={{ page.next_page_number }}">Next</a>{% endif %}
-</nav></div>
+{% include 'students/students_directory_results_table.html' %}
+{% include 'components/school_pagination.html' with page=page pagination_label='Student pages' page_parameter='page' filter_query=filter_query only %}</div>

@@ -1,3 +1,6 @@
+[tool.vercel]
+entrypoint = "config.wsgi:application"
+
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings.test"
 python_files = ["test_*.py"]
