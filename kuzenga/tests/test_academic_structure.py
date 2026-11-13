@@ -309,7 +309,7 @@ def test_dashboard_and_class_curriculum_rendering(client, tenant_a, admin_a, tea
     assert client.get(reverse("academics:progression")).status_code == 403
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 def test_migration_does_not_rebuild_existing_tables():
     output = StringIO()
     call_command("sqlmigrate", "academics", "0004", stdout=output)

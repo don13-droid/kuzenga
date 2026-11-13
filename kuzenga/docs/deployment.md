@@ -1,8 +1,11 @@
 # Deployment preparation: Vercel and Neon
 
-Owner approved ADR-0002 for preparatory implementation only on 2026-11-10.
-No deployment, DNS write, paid resource, production database operation or merge to
-`main` is authorized. See the [approval record](../../docs/architecture/decisions/0002-vercel-deployment.md)
+Owner approved ADR-0002 for preparatory implementation on 2026-11-10, then
+explicitly requested a working Vercel preview and deployment fixes on 2026-11-13.
+The current task authorizes repairing and deploying the existing protected preview
+using its already configured Neon and Cloudflare R2 resources. It does not authorize
+production deployment, production database operations, DNS writes, paid resources
+or merging to `main`. See the [approval record](../../docs/architecture/decisions/0002-vercel-deployment.md)
 and [audit/release checklist](../../docs/operations/vercel-deployment.md).
 
 ## Runtime and assets
@@ -13,7 +16,7 @@ existing production requirements/constraints; it is not a second dependency list
 `tool.vercel.entrypoint` pins `config.wsgi:application`. `vercel.json` sets production
 entrypoint options, excludes local data from the function and disables **all automatic Git
 deployments**. This is a source safeguard, not proof of remote account controls.
-Do not link/import/deploy until a preview release is explicitly approved.
+The current owner request approves the protected preview; automatic Git deployments remain disabled.
 `manage.py` defaults to production on Vercel for both native build discovery and
 management commands; local development keeps its existing default. Explicitly set
 the production settings module in remote environment scopes too. No legacy
@@ -41,7 +44,7 @@ documentation values and is excluded from deployment uploads. On Vercel,
 | --- | --- |
 | `DJANGO_SETTINGS_MODULE` | `config.settings.production`; explicitly set in the remote build/runtime environment scope. Native discovery also defaults to production when `VERCEL=1`. |
 | `DJANGO_SECRET_KEY` | Independently generated per environment; at least 50 characters, not a placeholder or repeated character value. |
-| `DJANGO_ALLOWED_HOSTS` | Exact comma-separated hostnames; no wildcard, leading dot, URL scheme or port. Include only the selected preview/custom domains. |
+| `DJANGO_ALLOWED_HOSTS` | Required exact comma-separated hostnames; no wildcard, leading dot, URL scheme or port. Include only the selected preview/custom domains. On Vercel, validated `VERCEL_URL` and `VERCEL_BRANCH_URL` are also allowed exactly. |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | Exact HTTPS origins matching allowed hosts; optional for same-origin requests. Do not trust every `vercel.app` deployment. |
 | `DATABASE_URL` | Pooled Neon PostgreSQL URL with `sslmode=require` or stronger; retain Neon channel-binding parameters. Never reuse production credentials in preview. |
 | `MEDIA_STORAGE_BACKEND` | `s3` on Vercel; missing/`filesystem` is rejected there. Non-Vercel production retains filesystem compatibility. |
@@ -51,6 +54,15 @@ documentation values and is excluded from deployment uploads. On Vercel,
 | `S3_ADDRESSING_STYLE` | `auto` by default; use a provider-supported choice after integration testing. |
 | `LOG_LEVEL` | Console logging, default `INFO`; do not enable sensitive request/query logging. |
 | `DJANGO_HSTS_INCLUDE_SUBDOMAINS`, `DJANGO_HSTS_PRELOAD` | Default false; enable only after reviewing every affected domain service. Django deployment checks warn W005/W021 when these are false; review the domain policy before release. |
+
+With `VERCEL=true`, production settings add only Vercel's exact deployment and
+branch system hostnames (`VERCEL_URL` and `VERCEL_BRANCH_URL`). Nonempty values
+must be lowercase DNS names ending in `.vercel.app`, with valid labels and lengths;
+schemes, ports, paths, credentials, whitespace and wildcards are rejected at startup.
+No request header, unrelated deployment or `VERCEL_PROJECT_PRODUCTION_URL` grants
+access. These variables are ignored outside Vercel. Explicit
+`DJANGO_ALLOWED_HOSTS` remains mandatory and validated. Same-origin CSRF protection
+continues to apply; this does not add wildcard trusted origins.
 
 Production enforces HTTPS redirection, secure cookies, HttpOnly session cookies,
 same-site cookies and trusted proxy HTTPS indication. Sessions use Django's
