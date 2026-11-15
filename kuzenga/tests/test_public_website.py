@@ -94,3 +94,32 @@ def test_authenticated_root_is_public_and_dashboard_still_available(client, admi
     assert b'Welcome' in client.get(reverse('dashboard')).content
     assert reverse('dashboard') == '/dashboard/'
 
+
+@pytest.mark.django_db
+def test_redesigned_home_has_supplied_brand_photos_and_private_previews(client):
+    from django.contrib.staticfiles import finders
+    response = client.get('/')
+    html = response.content.decode()
+    for asset in ('elevon-logo', 'students-learning', 'teacher-classroom', 'digital-team', 'kuzenga-students', 'kuzenga-admissions'):
+        path = 'images/corporate/' + asset + '.png'
+        assert path in html
+        assert finders.find(path)
+    assert 'Privacy-edited student directory preview' in html
+    assert 'Privacy-edited admissions preview' in html
+    assert 'data-preview="students"' in html and 'data-preview="admissions"' in html
+    assert 'aria-label="Mobile navigation"' in html
+    assert 'School Login' in html and 'Student Login' in html
+
+
+def test_serverless_and_project_landing_templates_stay_in_sync():
+    from pathlib import Path
+
+    from django.conf import settings
+
+    project = Path(settings.BASE_DIR)
+    template = (project / "templates/public/home.html").read_text(encoding="utf-8")
+    assert template == (project / "apps/core/templates/public/home.html").read_text(encoding="utf-8")
+    assert "{{ portal_login_url }}" in template
+    assert "{{ platform_login_url }}" in template
+    assert "mailto:info@elevondigitalzw.com" in template
+    assert "&copy; 2026 Elevon Digital. All rights reserved." in template

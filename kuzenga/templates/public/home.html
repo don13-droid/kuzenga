@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#061B38">
 <meta name="description" content="Elevon Digital develops modern digital solutions. Explore Kuzenga school management and termly pricing.">
+<link rel="icon" type="image/png" href="{% static 'images/corporate/elevon-logo.png' %}">
 <title>Elevon Digital | Elevating Ideas. Engineering Progress.</title>
 <link rel="stylesheet" href="{% static 'css/corporate.css' %}">
 <script src="{% static 'js/corporate.js' %}" defer>
@@ -14,81 +15,205 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-header">
-<a class="wordmark" href="{% url 'corporate-home' %}">ELEVON<span>DIGITAL</span>
+  <div class="header-inner wrap">
+    <a class="brand" href="{% url 'corporate-home' %}" aria-label="Elevon Digital home">
+<img src="{% static 'images/corporate/elevon-logo.png' %}" alt="Elevon Digital" width="2048" height="443">
 </a>
-<nav aria-label="Main navigation">
-<a href="#about">About</a>
-<a href="#solutions">Solutions</a>
+    <nav class="desktop-nav" aria-label="Main navigation">
+<a href="#about">Our story</a>
+<a href="#solutions">Kuzenga</a>
+<a href="#showcase">Inside the platform</a>
 <a href="#pricing">Pricing</a>
 <a href="{{ portal_login_url }}">School Login</a>
 <a href="{{ portal_login_url }}">Student Login</a>
-<a class="button small" href="#contact">Request a Demo</a>
+<a class="button small" href="#contact">Let&rsquo;s talk <span aria-hidden="true">&#8599;</span>
+</a>
 </nav>
+    <details class="mobile-nav">
+<summary>Menu <span aria-hidden="true">&#9776;</span>
+</summary>
+<nav aria-label="Mobile navigation">
+<a href="#about">Our story</a>
+<a href="#solutions">Explore Kuzenga</a>
+<a href="#showcase">Inside the platform</a>
+<a href="#pricing">Pricing</a>
+<a href="{{ portal_login_url }}">School Login</a>
+<a href="{{ portal_login_url }}">Student Login</a>
+<a href="#contact">Request a Demo</a>
+</nav>
+</details>
+  </div>
 </header>
 <main id="main">
-<section class="hero wrap">
-<div class="hero-copy">
-<p class="eyebrow">ELEVON DIGITAL · ZIMBABWE</p>
-<h1>Elevating Ideas.<br>
-<em>Engineering Progress.</em>
+<section class="hero-shell">
+  <div class="hero wrap">
+    <div class="hero-copy">
+      <p class="eyebrow">
+<span class="status-dot" aria-hidden="true">
+</span> IDEAS INTO IMPACT</p>
+      <h1>Elevating Ideas.<br>
+<em>Engineering<br>Progress.</em>
 </h1>
-<p class="intro">Elevon Digital develops modern digital solutions that simplify operations, improve efficiency and help organisations achieve more.</p>
-<div class="actions">
-<a class="button" href="#kuzenga">Explore Kuzenga <span aria-hidden="true">↗</span>
+      <p class="intro">Elevon Digital develops modern digital solutions that simplify operations, improve efficiency and help organisations achieve more.</p>
+      <div class="actions">
+<a class="button" href="#kuzenga">Explore Kuzenga <span aria-hidden="true">&#8599;</span>
 </a>
-<a class="outline" href="#contact">Request a Demo</a>
+<a class="hero-link" href="#contact">Request a Demo <span aria-hidden="true">&#8599;</span>
+</a>
 </div>
-<p class="fine">Purposeful technology. Practical progress.</p>
+      <div class="hero-signoff">
+<span class="signoff-line" aria-hidden="true">
+</span>
+<p>Built around people.<br>
+<strong>Designed for progress.</strong>
+</p>
 </div>
-<div class="hero-panel">
-<p class="eyebrow">OUR SCHOOL MANAGEMENT SOLUTION</p>
-<h2>Kuzenga</h2>
-<p>Bring school operations together.</p>
-<div class="product-list">
-<span>Student records & admissions</span>
-<span>Academic management & attendance</span>
-<span>School fees & financial operations</span>
+    </div>
+    <div class="hero-visual">
+      <figure class="hero-photo">
+<img src="{% static 'images/corporate/students-learning.png' %}" alt="Students exploring a lesson together on a laptop in their classroom" width="1536" height="1024" fetchpriority="high">
+<figcaption>
+<span class="photo-label">THE FUTURE STARTS HERE</span>
+<strong>More possibility.<br>Every school day.</strong>
+</figcaption>
+</figure>
+      <div class="hero-note">
+<span class="note-symbol" aria-hidden="true">&#8599;</span>
+<div>
+<strong>Meet Kuzenga</strong>
+<span>School management, connected.</span>
 </div>
-<a href="#pricing">Starter — from US$30 per school term →</a>
+<a href="#showcase" aria-label="See inside Kuzenga">&#8594;</a>
+</div>
+      <span class="visual-corner" aria-hidden="true">
+</span>
+    </div>
+  </div>
+  <div class="hero-bottom wrap">
+<span>STUDENT RECORDS</span>
+<span>ACADEMIC MANAGEMENT</span>
+<span>ATTENDANCE</span>
+<span>SCHOOL FINANCE</span>
 </div>
 </section>
-<section id="about" class="section wrap split">
+<section id="about" class="section wrap about-grid">
+  <div class="about-photo">
+<img src="{% static 'images/corporate/digital-team.png' %}" alt="A team collaborating around computers in a bright office" width="1536" height="1024" loading="lazy">
+<span class="photo-index" aria-hidden="true">01 / PEOPLE &amp; PURPOSE</span>
+</div>
+  <div class="section-copy">
 <p class="eyebrow">ABOUT ELEVON DIGITAL</p>
-<div>
-<h2>Digital solutions with everyday purpose.</h2>
-<p>We develop modern digital solutions to help organisations simplify their work and improve efficiency. Our focus is on useful software, clear experiences and practical operational needs.</p>
+<h2>Good technology.<br>
+<span class="muted">Real-world purpose.</span>
+</h2>
+<p>Behind every organisation are people with ideas, responsibilities and ambitions. We build digital solutions that make their everyday work simpler.</p>
+<p>Our focus is useful software, clear experiences and practical progress &mdash; starting with the way schools manage their operations.</p>
+<a class="text-link" href="#solutions">Discover our school management solution <span aria-hidden="true">&#8599;</span>
+</a>
 </div>
 </section>
 <section id="solutions" class="section tinted">
-<div class="wrap">
-<p class="eyebrow">OUR SOLUTIONS</p>
-<h2>Built around the work that matters.</h2>
-<div id="kuzenga" class="solution">
+  <div class="wrap">
+    <div class="section-heading">
 <div>
-<span class="tag">SCHOOL MANAGEMENT</span>
-<h3>Kuzenga</h3>
-<p>A connected workspace for school records, academic structures, attendance and finance, with school roles and tenant access controls.</p>
-<div class="actions">
-<a class="button" href="{{ portal_login_url }}">School Login</a>
+<p class="eyebrow">INTRODUCING KUZENGA</p>
+<h2>Less administration.<br>More room to <span class="blue">grow.</span>
+</h2>
+</div>
+<p>A connected workspace for the people who keep a school moving.</p>
+</div>
+    <div id="kuzenga" class="product-story">
+      <div class="product-image">
+<img src="{% static 'images/corporate/teacher-classroom.png' %}" alt="A teacher using a laptop while students work in the classroom" width="1536" height="1024" loading="lazy">
+<div class="product-caption">
+<span>KUZENGA</span>
+<strong>For the work behind<br>every school day.</strong>
+</div>
+</div>
+      <div class="product-features">
+        <article>
+<span class="feature-number">01</span>
+<div>
+<h3>Know every learner&rsquo;s journey.</h3>
+<p>Keep student records, applications and enrolment organised in one school workspace.</p>
+</div>
+</article>
+        <article>
+<span class="feature-number">02</span>
+<div>
+<h3>Bring academic work together.</h3>
+<p>Connect classes, subjects, attendance and assessment workflows.</p>
+</div>
+</article>
+        <article>
+<span class="feature-number">03</span>
+<div>
+<h3>Keep school finances in view.</h3>
+<p>Work with fees, balances and financial records through controlled, role-based access.</p>
+</div>
+</article>
+        <div class="actions">
+<a class="button" href="{{ portal_login_url }}">School Login <span aria-hidden="true">&#8599;</span>
+</a>
 <a class="outline" href="{{ portal_login_url }}">Student Login</a>
 </div>
-<p class="fine">Students use the existing school sign-in. Access depends on their school membership and permissions.</p>
-</div>
-<div>
-<h3>One school. A clearer view.</h3>
-<ul>
-<li>Manage student records and admissions.</li>
-<li>Organise classes, subjects and academic years.</li>
-<li>Keep attendance and assessment workflows connected.</li>
-<li>Manage fees and financial records with controlled access.</li>
-</ul>
-</div>
-</div>
-</div>
+        <p class="fine">Students use the school sign-in with their existing school membership and permissions.</p>
+      </div>
+    </div>
+  </div>
 </section>
-<section id="pricing" class="section wrap">
+<section id="showcase" class="section showcase-section">
+  <div class="wrap">
+    <div class="section-heading">
+<div>
+<p class="eyebrow">EXPERIENCE KUZENGA</p>
+<h2>A closer look.<br>
+<span class="muted">A clearer school day.</span>
+</h2>
+</div>
+<p>Explore the actual student and admissions screens, then walk through your school&rsquo;s needs with our team.</p>
+</div>
+    <div class="showcase-tabs" role="group" aria-label="Application preview">
+<button type="button" class="preview-tab" data-preview="students" aria-pressed="true">Student records <span aria-hidden="true">&#8599;</span>
+</button>
+<button type="button" class="preview-tab" data-preview="admissions" aria-pressed="false">Admissions <span aria-hidden="true">&#8599;</span>
+</button>
+</div>
+    <noscript><style>.app-preview[hidden]{display:block}.showcase-tabs{display:none}</style></noscript>
+<div class="browser-frame">
+<div class="browser-bar" aria-hidden="true">
+<span class="browser-dots">
+<i>
+</i>
+<i>
+</i>
+<i>
+</i>
+</span>
+<span>Kuzenga / School workspace</span>
+<span class="browser-secure">SCHOOL PORTAL</span>
+</div>
+      <figure class="app-preview" id="preview-students">
+<img src="{% static 'images/corporate/kuzenga-students.png' %}" alt="Kuzenga student directory with learner filters and student records table" width="1548" height="1016" loading="lazy">
+<figcaption>Privacy-edited student directory preview &mdash; find learners, filter records and manage enrolment.</figcaption>
+</figure>
+      <figure class="app-preview" id="preview-admissions" hidden>
+<img src="{% static 'images/corporate/kuzenga-admissions.png' %}" alt="Kuzenga admissions dashboard with application stages and review actions" width="1548" height="1016" loading="lazy">
+<figcaption>Privacy-edited admissions preview &mdash; follow applications from draft to enrolment.</figcaption>
+</figure>
+    </div>
+    <div class="showcase-footer">
+<p>See how the workflows fit your school.</p>
+<a class="text-link" href="#contact">Book a guided walkthrough <span aria-hidden="true">&#8599;</span>
+</a>
+</div>
+  </div>
+</section>
+<section id="pricing" class="section wrap pricing-section">
 <p class="eyebrow">STRAIGHTFORWARD TERMLY PRICING</p>
-<h2>Choose the right starting point.</h2>
+<h2>A plan for your school.<br>
+<span class="muted">Room for what&rsquo;s next.</span>
+</h2>
 <p>Kuzenga Starter — From US$30 per school term. All prices in USD.</p>
 <div class="table-scroll" tabindex="0" role="region" aria-label="Subscription and once-off setup prices">
 <table>
@@ -147,26 +272,15 @@
 <a class="button" href="#contact">Discuss your requirements</a>
 </div>
 </div>{{ pricing|json_script:'pricing-data' }}</section>
-<section id="showcase" class="section tinted">
-<div class="wrap solution">
-<div>
-<p class="eyebrow">EXPERIENCE KUZENGA</p>
-<h2>See the workflows in a guided demo.</h2>
-<p>Explore student records, academic organisation and school operations with our team.</p>
-<a class="outline" href="#contact">Request an application walkthrough</a>
-</div>
-<figure class="office-photo">
-<img src="{% static 'images/corporate/school-office.png' %}" alt="Two school professionals reviewing documents together at a laptop" width="1536" height="1024" loading="lazy">
-<figcaption>Supporting the everyday work of school teams.</figcaption>
-</figure>
-</div>
-</section>
-<section id="contact" class="section wrap contact">
+<section id="contact" class="section contact-shell">
+<div class="wrap contact">
 <div>
 <p class="eyebrow">LET’S TALK</p>
 <h2>Move your school forward.</h2>
 <p>Tell us what your school needs. We’ll help you explore the right fit.</p>
-<p>Email: <a href="mailto:info@elevondigitalzw.com">info@elevondigitalzw.com</a>
+<p>General: <a href="mailto:inquiries@elevondigitalzw.com">inquiries@elevondigitalzw.com</a>
+</p>
+<p>Sales: <a href="mailto:info@elevondigitalzw.com">info@elevondigitalzw.com</a>
 </p>
 <p>WhatsApp: <a href="https://wa.me/263710919170">0710919170</a>
 </p>
@@ -175,17 +289,17 @@
 <h3>Request a demo</h3>{% if sent %}<p role="status">Thank you. Your enquiry has been received.</p>{% endif %}{{ form.non_field_errors }}{% for field in form %}{% if field.is_hidden %}{{ field }}{% else %}<div class="field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endif %}{% endfor %}<p class="fine">We store these details to respond to your enquiry. Please do not include student records or financial information.</p>
 <button class="button" type="submit">Send enquiry</button>
 </form>
+</div>
 </section>
 </main>
 <footer class="wrap footer">
-<a class="wordmark" href="{% url 'corporate-home' %}">ELEVON<span>DIGITAL</span>
+<a class="brand footer-brand" href="{% url 'corporate-home' %}">
+<img src="{% static 'images/corporate/elevon-logo.png' %}" alt="Elevon Digital" width="2048" height="443">
 </a>
-<a href="https://www.elevondigital.com">www.elevondigital.com</a>
-<a href="mailto:info@elevondigitalzw.com">info@elevondigitalzw.com</a>
-<span>&copy; 2026 Elevon Digital. All rights reserved.</span>
+<a href="https://www.elevondigitalzw.com">www.elevondigitalzw.com</a>
 <a href="{{ platform_login_url }}">Platform Administration</a>
+<p>&copy; 2026 Elevon Digital. All rights reserved.</p>
 </footer>
 <a class="whatsapp" href="https://wa.me/263710919170" aria-label="Contact Elevon Digital on WhatsApp">WhatsApp ↗</a>
 </body>
 </html>
-
