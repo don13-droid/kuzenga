@@ -171,6 +171,58 @@ def test_repeated_unchanged_edit_is_noop(tenant_a, operator):
     assert before == (SubscriptionEvent.objects.count(), Entitlement.objects.count(), AuditEvent.objects.count())
 
 
+def test_unchanged_edit_repairs_missing_plan_grants_only(tenant_a, tenant_b, operator):
+    sub = tenant_a.subscriptions.latest("created_at")
+    Entitlement.objects.filter(subscription=sub, module_id="students").delete()
+    exception = Entitlement.objects.create(tenant=tenant_a, module_id="finance", source="exception")
+    other_grants = list(tenant_b.entitlements.values_list("pk", "status"))
+    data = values(started_at=sub.started_at, current_period_end=sub.current_period_end)
+
+    save_subscription(tenant=tenant_a, actor=operator, subscription_id=sub.pk, **data)
+
+    assert has_module(tenant_a, "students")
+    assert has_module(tenant_a, "finance")
+    exception.refresh_from_db()
+    assert exception.status == "active"
+    assert list(tenant_b.entitlements.values_list("pk", "status")) == other_grants
+    assert sub.subscriptionevent_set.filter(event_type="reconciled").exists()
+    assert AuditEvent.objects.filter(action="subscription.reconciled", object_id=str(sub.pk)).exists()
+    before = (SubscriptionEvent.objects.count(), Entitlement.objects.count(), AuditEvent.objects.count())
+    save_subscription(tenant=tenant_a, actor=operator, subscription_id=sub.pk, **data)
+    assert before == (SubscriptionEvent.objects.count(), Entitlement.objects.count(), AuditEvent.objects.count())
+
+
+def test_unchanged_edit_repairs_dates_without_extending_subscription(tenant_a, operator):
+    sub = tenant_a.subscriptions.latest("created_at")
+    Entitlement.objects.filter(subscription=sub).update(valid_until=timezone.now() - timedelta(days=1))
+    assert not has_module(tenant_a, "students")
+
+    save_subscription(
+        tenant=tenant_a, actor=operator, subscription_id=sub.pk,
+        **values(started_at=sub.started_at, current_period_end=sub.current_period_end),
+    )
+
+    assert has_module(tenant_a, "students")
+    assert set(Entitlement.objects.active().filter(subscription=sub).values_list("valid_until", flat=True)) == {
+        sub.current_period_end
+    }
+
+
+def test_unchanged_non_access_subscription_removes_stale_grants(tenant_a, operator):
+    sub = tenant_a.subscriptions.latest("created_at")
+    # Reproduce old/imported records whose commercial state and grants disagree.
+    Subscription.objects.filter(pk=sub.pk).update(status=Subscription.Status.SUSPENDED)
+    sub.refresh_from_db()
+
+    save_subscription(
+        tenant=tenant_a, actor=operator, subscription_id=sub.pk,
+        **values(status=sub.status, started_at=sub.started_at, current_period_end=sub.current_period_end),
+    )
+
+    assert not has_module(tenant_a, "students")
+    assert not Entitlement.objects.filter(subscription=sub, status="active").exists()
+
+
 def test_entitlement_rejects_other_tenant_subscription(tenant_a, tenant_b):
     ent = Entitlement(tenant=tenant_a, module_id="students", subscription=tenant_b.subscriptions.first())
     with pytest.raises(ValidationError):
@@ -211,3 +263,4 @@ def test_audit_failure_rolls_back_subscription_and_entitlements(tenant_a, operat
         save_subscription(tenant=tenant_a, actor=operator, subscription_id=sub.pk, **values(status="suspended"))
     sub.refresh_from_db()
     assert sub.status == "active" and has_module(tenant_a, "students")
+

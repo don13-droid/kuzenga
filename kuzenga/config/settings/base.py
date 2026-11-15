@@ -15,6 +15,11 @@ if not env.bool("VERCEL", default=False):
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-only-insecure-key")
 DEBUG = env.bool("DJANGO_DEBUG")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
+PUBLIC_SITE_HOST = env("PUBLIC_SITE_HOST", default="")
+PLATFORM_SITE_HOST = env("PLATFORM_SITE_HOST", default="")
+CLIENT_SITE_HOST = env("CLIENT_SITE_HOST", default="")
+CONTACT_EMAIL = "info@elevondigitalzw.com"
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=CONTACT_EMAIL)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -44,6 +49,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.core.hosts.PortalHostMiddleware",
     "apps.tenancy.middleware.TenantMiddleware",
     "apps.core.direct_uploads.DirectUploadMiddleware",
 ]
@@ -115,3 +121,4 @@ LOGGING = {
     "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "standard"}},
     "root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO")},
 }
+

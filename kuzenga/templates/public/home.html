@@ -20,8 +20,8 @@
 <a href="#about">About</a>
 <a href="#solutions">Solutions</a>
 <a href="#pricing">Pricing</a>
-<a href="{% url 'login' %}">School Login</a>
-<a href="{% url 'login' %}">Student Login</a>
+<a href="{{ portal_login_url }}">School Login</a>
+<a href="{{ portal_login_url }}">Student Login</a>
 <a class="button small" href="#contact">Request a Demo</a>
 </nav>
 </header>
@@ -69,8 +69,8 @@
 <h3>Kuzenga</h3>
 <p>A connected workspace for school records, academic structures, attendance and finance, with school roles and tenant access controls.</p>
 <div class="actions">
-<a class="button" href="{% url 'login' %}">School Login</a>
-<a class="outline" href="{% url 'login' %}">Student Login</a>
+<a class="button" href="{{ portal_login_url }}">School Login</a>
+<a class="outline" href="{{ portal_login_url }}">Student Login</a>
 </div>
 <p class="fine">Students use the existing school sign-in. Access depends on their school membership and permissions.</p>
 </div>
@@ -166,9 +166,7 @@
 <p class="eyebrow">LET’S TALK</p>
 <h2>Move your school forward.</h2>
 <p>Tell us what your school needs. We’ll help you explore the right fit.</p>
-<p>General: <a href="mailto:inquiries@elevondigitalzw.com">inquiries@elevondigitalzw.com</a>
-</p>
-<p>Sales: <a href="mailto:sales@elevondigitalzw.com">sales@elevondigitalzw.com</a>
+<p>Email: <a href="mailto:info@elevondigitalzw.com">info@elevondigitalzw.com</a>
 </p>
 <p>WhatsApp: <a href="https://wa.me/263710919170">0710919170</a>
 </p>
@@ -182,9 +180,12 @@
 <footer class="wrap footer">
 <a class="wordmark" href="{% url 'corporate-home' %}">ELEVON<span>DIGITAL</span>
 </a>
-<a href="https://www.elevondigitalzw.com">www.elevondigitalzw.com</a>
-<a href="{% url 'platform-login' %}">Platform Administration</a>
+<a href="https://www.elevondigital.com">www.elevondigital.com</a>
+<a href="mailto:info@elevondigitalzw.com">info@elevondigitalzw.com</a>
+<span>&copy; 2026 Elevon Digital. All rights reserved.</span>
+<a href="{{ platform_login_url }}">Platform Administration</a>
 </footer>
 <a class="whatsapp" href="https://wa.me/263710919170" aria-label="Contact Elevon Digital on WhatsApp">WhatsApp ↗</a>
 </body>
 </html>
+

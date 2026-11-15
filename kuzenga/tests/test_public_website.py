@@ -61,6 +61,7 @@ def test_enquiry_validation_storage_email_and_throttle(client, settings):
     assert client.post(reverse('corporate-home'), data).status_code == 302
     assert DemoEnquiry.objects.count() == 1
     assert len(mail.outbox) == 1
+    assert mail.outbox[0].to == ['info@elevondigitalzw.com']
     assert data['email'] not in mail.outbox[0].body
     assert client.post(reverse('corporate-home'), data).status_code == 429
     assert DemoEnquiry.objects.count() == 1
@@ -92,3 +93,4 @@ def test_authenticated_root_is_public_and_dashboard_still_available(client, admi
     assert b'Elevating Ideas.' in client.get('/').content
     assert b'Welcome' in client.get(reverse('dashboard')).content
     assert reverse('dashboard') == '/dashboard/'
+

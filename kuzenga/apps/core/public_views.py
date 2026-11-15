@@ -10,6 +10,7 @@ from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
+from .hosts import portal_url
 from .models import DemoEnquiry
 from .pricing import ADDONS, BANDS, FEATURES
 from .public_forms import DemoEnquiryForm
@@ -38,7 +39,7 @@ def home(request):
                 lead = DemoEnquiry.objects.create(**values)
                 try:
                     send_mail('New Kuzenga demo enquiry', f'Enquiry {lead.pk} received. Review securely in the database.',
-                              settings.DEFAULT_FROM_EMAIL, ['sales@elevondigitalzw.com'])
+                              settings.DEFAULT_FROM_EMAIL, [settings.CONTACT_EMAIL])
                 except (SMTPException, OSError):
                     logger.warning('Demo enquiry saved; email notification unavailable')
                 return redirect(reverse('corporate-home') + '?sent=1#contact')
@@ -48,7 +49,10 @@ def home(request):
         'enquiry_token': signing.dumps('demo', salt='demo-enquiry'),
         'bands': BANDS, 'addons': ADDONS, 'features': FEATURES,
         'pricing': {'bands': BANDS, 'addons': ADDONS},
+        'portal_login_url': portal_url('CLIENT_SITE_HOST', reverse('login')),
+        'platform_login_url': portal_url('PLATFORM_SITE_HOST', reverse('platform-login')),
         }, status=status)
     except (TemplateDoesNotExist, TemplateSyntaxError) as exc:
         logger.error('Preview homepage template failure: %s: %s', type(exc).__name__, str(exc)[:600])
         raise
+

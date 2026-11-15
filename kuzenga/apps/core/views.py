@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.accounts.forms import PlatformAuthenticationForm, SchoolAuthenticationForm
+from apps.tenancy.permissions import has_permission
 from apps.tenancy.services import has_module
 
 
@@ -50,12 +51,13 @@ def dashboard(request):
         return redirect("tenancy:select")
 
     stats = []
-    if has_module(request.tenant, "students"):
+    if has_permission(request.membership, "students.view") and has_module(request.tenant, "students"):
         from apps.students.models import Student
 
         stats.append(("Active learners", Student.objects.filter(status="active").count()))
-    if has_module(request.tenant, "academics"):
+    if has_permission(request.membership, "academics.view") and has_module(request.tenant, "academics"):
         from apps.academics.models import ClassGroup
 
         stats.append(("Classes", ClassGroup.objects.count()))
     return render(request, "dashboard/index.html", {"stats": stats})
+
