@@ -18,7 +18,7 @@ from .public_forms import DemoEnquiryForm
 logger = logging.getLogger(__name__)
 
 
-@require_http_methods(['GET', 'POST'])
+@require_http_methods(['GET', 'HEAD', 'POST'])
 def home(request):
     form = DemoEnquiryForm(request.POST if request.method == 'POST' else None)
     status = 200

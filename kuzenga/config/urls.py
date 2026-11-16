@@ -5,12 +5,15 @@ from django.urls import include, path
 from apps.core.direct_uploads import grant
 from apps.core.media_views import image
 from apps.core.public_views import home
+from apps.core.seo import robots, sitemap
 from apps.core.views import PlatformLoginView, PortalLoginView, dashboard, health
 from apps.tenancy import user_admin_views
 
 urlpatterns = [
     path("", home, name="corporate-home"),
     path("elevon/", home, name="corporate-alias"),
+    path("robots.txt", robots, name="robots"),
+    path("sitemap.xml", sitemap, name="sitemap"),
     path("uploads/grant/", grant, name="direct-upload-grant"),
     path("media/<path:path>", image, name="protected-image"),
     path("admin/", admin.site.urls),

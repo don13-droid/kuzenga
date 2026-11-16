@@ -61,7 +61,7 @@ def test_enquiry_validation_storage_email_and_throttle(client, settings):
     assert client.post(reverse('corporate-home'), data).status_code == 302
     assert DemoEnquiry.objects.count() == 1
     assert len(mail.outbox) == 1
-    assert mail.outbox[0].to == ['info@elevondigitalzw.com']
+    assert mail.outbox[0].to == ['inquiries@elevondigitalzw.com']
     assert data['email'] not in mail.outbox[0].body
     assert client.post(reverse('corporate-home'), data).status_code == 429
     assert DemoEnquiry.objects.count() == 1
@@ -121,5 +121,37 @@ def test_serverless_and_project_landing_templates_stay_in_sync():
     assert template == (project / "apps/core/templates/public/home.html").read_text(encoding="utf-8")
     assert "{{ portal_login_url }}" in template
     assert "{{ platform_login_url }}" in template
-    assert "mailto:info@elevondigitalzw.com" in template
+    assert "mailto:sales@elevondigitalzw.com" in template
     assert "&copy; 2026 Elevon Digital. All rights reserved." in template
+
+
+@pytest.mark.django_db
+def test_public_search_metadata_and_contact_details(client):
+    import json
+    import re
+
+    html = client.get("/").content.decode()
+    assert '<link rel="canonical" href="https://www.elevondigitalzw.com/">' in html
+    for token in (
+        'property="og:title"', 'property="og:description"', 'property="og:url"',
+        'property="og:image"', 'name="twitter:card"', 'name="twitter:description"',
+        "mailto:inquiries@elevondigitalzw.com", "mailto:sales@elevondigitalzw.com",
+        "tel:+263774647140", "tel:+263710919170", "https://wa.me/263710919170",
+    ):
+        assert token in html
+    blocks = re.findall(r'<script type="application/ld\+json">([\s\S]*?)</script>', html)
+    assert len(blocks) == 1
+    graph = json.loads(blocks[0])["@graph"]
+    assert {item["@type"] for item in graph} == {
+        "Organization", "WebSite", "SoftwareApplication",
+    }
+    assert all(item["@id"].startswith("https://www.elevondigitalzw.com/") for item in graph)
+    for question in (
+        "What is Kuzenga?", "Who is Kuzenga designed for?",
+        "What school administration problems does Kuzenga address?",
+        "How does Kuzenga help manage school fees?",
+        "How does Kuzenga help school administrators?",
+        "How can schools request a demonstration?",
+    ):
+        assert question in html
+    assert "a separate student self-service portal is not currently available" in html

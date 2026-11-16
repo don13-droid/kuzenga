@@ -46,7 +46,7 @@ class PortalHostMiddleware:
             return self.get_response(request)
         host, _port = split_domain_port(request.get_host())
         path = request.path_info
-        if path.startswith(SHARED_PATHS):
+        if path in ("/robots.txt", "/sitemap.xml") or path.startswith(SHARED_PATHS):
             return self.get_response(request)
         if path == "/elevon/" and host in (self.hosts["PLATFORM_SITE_HOST"], self.hosts["CLIENT_SITE_HOST"]):
             return self._move(request, "PUBLIC_SITE_HOST")
