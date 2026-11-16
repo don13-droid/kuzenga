@@ -34,6 +34,9 @@ def postgres_database(django_db_blocker):
     # Explicitly create the default disposable test database instead.
     assert os.environ.get("KUZENGA_RUN_PG_ACCEPTANCE") == "1"
     assert connection.vendor == "postgresql"
+    original_name = connection.settings_dict["NAME"]
+    test_name = connection.settings_dict.get("TEST", {}).get("NAME") or f"test_{original_name}"
+    assert test_name.startswith("test_") and test_name != original_name, "Refusing an unsafe test database name"
     with django_db_blocker.unblock():
         database_config = setup_databases(
             verbosity=0, interactive=False, aliases={"default"},
