@@ -1,6 +1,7 @@
 """Real Chromium smoke checks using a disposable, loopback-only Django app."""
 
 import io
+import json
 import os
 import secrets
 import socket
@@ -157,6 +158,39 @@ def authenticated_checks(browser, origin, email, password, platform=False):
         context.close()
 
 
+def lighthouse_checks(origin, chrome_path, directory):
+    environment = {**os.environ, "CHROME_PATH": chrome_path}
+    for profile, flags in (("mobile", []), ("desktop", ["--preset=desktop"])):
+        report_path = directory / f"lighthouse-{profile}.json"
+        subprocess.run(
+            [
+                "npx", "--yes", "lighthouse@12.8.2", origin + "/",
+                "--chrome-flags=--headless --no-sandbox --disable-dev-shm-usage",
+                "--output=json", f"--output-path={report_path}", "--quiet", *flags,
+            ],
+            env=environment, check=True, timeout=180,
+            stdout=subprocess.DEVNULL,
+        )
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        assert not report.get("runtimeError"), "Lighthouse runtime failure"
+        metrics = {}
+        for name in (
+            "largest-contentful-paint", "total-blocking-time",
+            "cumulative-layout-shift", "speed-index", "total-byte-weight",
+        ):
+            audit = report["audits"].get(name, {})
+            metrics[name] = audit.get("displayValue")
+        scores = {
+            name: round(category["score"] * 100)
+            for name, category in report["categories"].items()
+            if category.get("score") is not None
+        }
+        print("LIGHTHOUSE " + json.dumps({
+            "profile": profile, "scores": scores, "metrics": metrics,
+            "scope": "Isolated loopback app; noindex is intentional outside canonical HTTPS host.",
+        }, sort_keys=True))
+
+
 def main():
     password = secrets.token_urlsafe(32)
     with tempfile.TemporaryDirectory(prefix="kuzenga-browser-") as directory:
@@ -195,6 +229,7 @@ def main():
                 authenticated_checks(browser, origin, school_email, password)
                 authenticated_checks(browser, origin, platform_email, password, platform=True)
                 browser.close()
+                lighthouse_checks(origin, playwright.chromium.executable_path, Path(directory))
         finally:
             server.terminate()
             try:
