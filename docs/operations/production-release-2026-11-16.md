@@ -29,7 +29,7 @@ Existing draft PRs #1–#3 are not merged by this release preparation.
 
 Prepared code requires a fresh CI run. An existing green integration run is not validation of these changes.
 
-## Evidence and acceptance matrix
+## Preparation evidence and acceptance matrix
 
 | Item | Status | Evidence / remaining gate |
 | --- | --- | --- |
@@ -54,7 +54,19 @@ Prepared code requires a fresh CI run. An existing green integration run is not 
 | Remaining scope/issues | BLOCKED | Pricing/catalogue mismatch needs owner resolution; student self-service is absent; teacher directory/attendance are tenant-wide according to role; reset links are administrator-issued. |
 | Rollback/recovery | BLOCKED | Preview retained. No successful production rollback candidate found and no database restore rehearsal demonstrated. Procedures below must be completed. |
 
-CI evidence: https://github.com/don13-droid/kuzenga/actions/runs/43746407656
+Fresh verification before the dependency patch: commit 80af0d9ca907df5feae508de82457da855adfc99,
+https://github.com/don13-droid/kuzenga/actions/runs/43940790085.
+Both PostgreSQL16/18 jobs passed 496 ordinary tests plus the separately executed finance concurrency test, system/migration checks, and strict offline production/static checks.
+The first explicit acceptance attempt exposed a fixture defect (base database selected); it was fixed by explicit disposable database setup, pre-setup name guards, and a second guard before seeding. Financial assertions were retained.
+The independent dependency audit then found five DRF3.16.1 advisories (PYSEC-2026-3827, PYSEC-2026-3828, GHSA-33wh-fxxf-88vv, GHSA-3547-9m27-7rxg, GHSA-xw6w-gcfp-cf8m).
+This candidate pins DRF3.18.2, the audit-reported fix covering all five. Fresh CI/audit must pass after this dependency change.
+
+Fresh baseline HTTP checks through the authenticated Vercel fetch returned HTTP200 for /, /login/, /platform/login/ and /static/css/tailwind.css.
+GET /health/ returned HTTP200 with {"status":"ok","database":"ok"} and HTTPS/security headers.
+This verifies Preview connectivity through the deployed application, not production connectivity or authenticated workflows.
+
+This table records preparation findings; the release PR description carries the latest exact commit, CI and deployment results.
+Parent CI evidence: https://github.com/don13-droid/kuzenga/actions/runs/43746407656
 Baseline CI: https://github.com/don13-droid/kuzenga/actions/runs/43418350920
 Source scope/recovery evidence: https://github.com/don13-droid/kuzenga/pull/3
 Earlier Preview smoke/storage findings: https://github.com/don13-droid/kuzenga/pull/1
