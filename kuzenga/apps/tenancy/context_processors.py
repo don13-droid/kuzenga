@@ -8,7 +8,7 @@ from .services import active_module_codes
 def tenancy(request):
     tenant = getattr(request, "tenant", None)
     if tenant is None:
-        return {"tenant": None, "nav_items": []}
+        return {"tenant": None, "nav_items": [], "quick_action_items": []}
     entitled = active_module_codes(tenant)
     items = []
     for item in NAV_ITEMS:
@@ -21,4 +21,8 @@ def tenancy(request):
     active = max(matches, key=lambda item: len(item["href"]), default=None)
     for item in items:
         item["active"] = item is active
-    return {"tenant": tenant, "nav_items": items}
+    return {
+        "tenant": tenant,
+        "nav_items": items,
+        "quick_action_items": [item for item in items if item["url"] != "dashboard"],
+    }

@@ -1,7 +1,7 @@
 """Opt-in, committed multi-connection tests; only Django's disposable PostgreSQL DB.
 
 No db/transactional_db fixture: their flush would intentionally conflict with the
-append-only ledger guards. django_db_setup creates and destroys the whole test DB.
+append-only ledger guards. Explicit setup creates and destroys the whole test DB.
 """
 
 import os
@@ -12,6 +12,7 @@ from threading import Barrier
 import pytest
 from django.core.exceptions import ValidationError
 from django.db import close_old_connections, connection, transaction
+from django.test.utils import setup_databases, teardown_databases
 
 from apps.core.context import tenant_context
 from apps.finance.models import Journal, Payment, PaymentAllocation, Receipt
@@ -26,16 +27,39 @@ pytestmark = pytest.mark.skipif(
 )
 
 
+@pytest.fixture(scope="session")
+def postgres_database(django_db_blocker):
+    # Pytest-django infers setup aliases from db-marked tests. This standalone
+    # committed test deliberately has no db marker/TestCase transaction or flush.
+    # Explicitly create the default disposable test database instead.
+    assert os.environ.get("KUZENGA_RUN_PG_ACCEPTANCE") == "1"
+    assert connection.vendor == "postgresql"
+    original_name = connection.settings_dict["NAME"]
+    test_name = connection.settings_dict.get("TEST", {}).get("NAME") or f"test_{original_name}"
+    assert test_name.startswith("test_") and test_name != original_name, "Refusing an unsafe test database name"
+    with django_db_blocker.unblock():
+        database_config = setup_databases(
+            verbosity=0, interactive=False, aliases={"default"},
+        )
+    try:
+        assert connection.settings_dict["NAME"].startswith("test_"), "Refusing a non-test database"
+        yield
+    finally:
+        with django_db_blocker.unblock():
+            teardown_databases(database_config, verbosity=0)
+
+
 @pytest.fixture(autouse=True)
-def catalogue(django_db_setup, django_db_blocker):
+def catalogue(postgres_database, django_db_blocker):
     # Override conftest's transactional catalogue fixture: workers need committed rows.
     from django.core.management import call_command
 
     with django_db_blocker.unblock():
+        assert connection.settings_dict["NAME"].startswith("test_"), "Refusing a non-test database"
         call_command("seed_catalog")
 
 
-def test_postgresql_concurrent_financial_invariants(django_db_setup, django_db_blocker):
+def test_postgresql_concurrent_financial_invariants(postgres_database, django_db_blocker):
     with django_db_blocker.unblock():
         assert connection.vendor == "postgresql"
         assert connection.settings_dict["NAME"].startswith("test_"), "Refusing a non-test database"

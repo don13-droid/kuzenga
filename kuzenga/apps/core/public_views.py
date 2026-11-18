@@ -6,9 +6,11 @@ from django.core import signing
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.shortcuts import redirect, render
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
+from .hosts import portal_url
 from .models import DemoEnquiry
 from .pricing import ADDONS, BANDS, FEATURES
 from .public_forms import DemoEnquiryForm
@@ -16,7 +18,7 @@ from .public_forms import DemoEnquiryForm
 logger = logging.getLogger(__name__)
 
 
-@require_http_methods(['GET', 'POST'])
+@require_http_methods(['GET', 'HEAD', 'POST'])
 def home(request):
     form = DemoEnquiryForm(request.POST if request.method == 'POST' else None)
     status = 200
@@ -37,13 +39,20 @@ def home(request):
                 lead = DemoEnquiry.objects.create(**values)
                 try:
                     send_mail('New Kuzenga demo enquiry', f'Enquiry {lead.pk} received. Review securely in the database.',
-                              settings.DEFAULT_FROM_EMAIL, ['sales@elevondigitalzw.com'])
+                              settings.DEFAULT_FROM_EMAIL, [settings.CONTACT_EMAIL])
                 except (SMTPException, OSError):
                     logger.warning('Demo enquiry saved; email notification unavailable')
                 return redirect(reverse('corporate-home') + '?sent=1#contact')
-    return render(request, 'public/home.html', {
+    try:
+        return render(request, 'public/home.html', {
         'form': form, 'sent': request.GET.get('sent') == '1',
         'enquiry_token': signing.dumps('demo', salt='demo-enquiry'),
         'bands': BANDS, 'addons': ADDONS, 'features': FEATURES,
         'pricing': {'bands': BANDS, 'addons': ADDONS},
-    }, status=status)
+        'portal_login_url': portal_url('CLIENT_SITE_HOST', reverse('login')),
+        'platform_login_url': portal_url('PLATFORM_SITE_HOST', reverse('platform-login')),
+        }, status=status)
+    except (TemplateDoesNotExist, TemplateSyntaxError) as exc:
+        logger.error('Preview homepage template failure: %s: %s', type(exc).__name__, str(exc)[:600])
+        raise
+

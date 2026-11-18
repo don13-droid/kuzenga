@@ -37,6 +37,9 @@ def production_environment(**changes):
     return {
         **os.environ,
         "VERCEL": "1",
+        "VERCEL_URL": "",
+        "VERCEL_BRANCH_URL": "",
+        "VERCEL_PROJECT_PRODUCTION_URL": "",
         "DJANGO_SETTINGS_MODULE": "config.settings.production",
         "DJANGO_SECRET_KEY": secrets.token_urlsafe(64),
         "DJANGO_ALLOWED_HOSTS": "preview.example.invalid",
@@ -100,6 +103,73 @@ print(json.dumps({
         "static": "django.contrib.staticfiles.storage.StaticFilesStorage",
         "documents": "storages.backends.s3.S3Storage",
     }
+
+
+
+def test_vercel_only_allows_its_exact_deployment_and_branch_hosts():
+    code = """
+import json
+from django.http.request import validate_host
+from config.settings.production import ALLOWED_HOSTS
+print(json.dumps({
+    'hosts': ALLOWED_HOSTS,
+    'deployment': validate_host('kuzenga-own.vercel.app', ALLOWED_HOSTS),
+    'branch': validate_host('kuzenga-git-fix-own.vercel.app', ALLOWED_HOSTS),
+    'unrelated': validate_host('unrelated.vercel.app', ALLOWED_HOSTS),
+    'production': validate_host('production-only.vercel.app', ALLOWED_HOSTS),
+    'child': validate_host('child.kuzenga-own.vercel.app', ALLOWED_HOSTS),
+}))
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", code], cwd=PROJECT_ROOT,
+        env=production_environment(
+            VERCEL_URL="kuzenga-own.vercel.app",
+            VERCEL_BRANCH_URL="kuzenga-git-fix-own.vercel.app",
+            VERCEL_PROJECT_PRODUCTION_URL="production-only.vercel.app",
+        ),
+        capture_output=True, text=True, check=True,
+    )
+    assert json.loads(result.stdout) == {
+        "hosts": ["preview.example.invalid", "kuzenga-own.vercel.app", "kuzenga-git-fix-own.vercel.app"],
+        "deployment": True, "branch": True, "unrelated": False, "production": False, "child": False,
+    }
+
+
+@pytest.mark.parametrize("variable", ["VERCEL_URL", "VERCEL_BRANCH_URL"])
+@pytest.mark.parametrize("hostname", [
+    "https://kuzenga.vercel.app", "//kuzenga.vercel.app", "kuzenga.vercel.app/path",
+    "kuzenga.vercel.app:443", "user@kuzenga.vercel.app", "kuzenga.vercel.app\n",
+    "Kuzenga.vercel.app", "-kuzenga.vercel.app", "kuzenga-.vercel.app",
+    "kuzenga..vercel.app", "kuzenga.vercel.app.evil.invalid", "*.vercel.app",
+    "vercel.app", "a" * 64 + ".vercel.app",
+])
+def test_vercel_rejects_malformed_system_hostnames(variable, hostname):
+    result = subprocess.run(
+        [sys.executable, "-c", "import config.settings.production"], cwd=PROJECT_ROOT,
+        env=production_environment(**{variable: hostname}), capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert variable + " must be an exact lowercase Vercel DNS hostname" in result.stderr
+
+
+def test_vercel_still_requires_explicit_configured_hosts():
+    result = subprocess.run(
+        [sys.executable, "-c", "import config.settings.production"], cwd=PROJECT_ROOT,
+        env=production_environment(DJANGO_ALLOWED_HOSTS="", VERCEL_URL="kuzenga-own.vercel.app"),
+        capture_output=True, text=True, check=False,
+    )
+    assert result.returncode != 0
+    assert "Set DJANGO_ALLOWED_HOSTS in production" in result.stderr
+
+
+def test_vercel_system_hosts_are_ignored_outside_vercel():
+    result = subprocess.run(
+        [sys.executable, "-c", "import json; from config.settings.production import ALLOWED_HOSTS; print(json.dumps(ALLOWED_HOSTS))"],
+        cwd=PROJECT_ROOT,
+        env=production_environment(VERCEL="0", VERCEL_URL="https://untrusted.invalid/path", VERCEL_BRANCH_URL="wrong:443"),
+        capture_output=True, text=True, check=True,
+    )
+    assert json.loads(result.stdout) == ["preview.example.invalid"]
 
 
 def test_object_image_urls_keep_authorized_django_route():

@@ -1,12 +1,12 @@
-﻿(() => {
-  const sidebar = document.getElementById("school-sidebar");
-  const toggle = document.querySelector(".school-sidebar-toggle");
+(() => {
+  const sidebar = document.querySelector("[data-navigation-sidebar], #school-sidebar");
+  const toggle = document.querySelector("[data-navigation-toggle], .school-sidebar-toggle");
   if (!sidebar || !toggle) return;
 
   const mobile = window.matchMedia("(max-width: 767px)");
-  const overlay = document.querySelector(".school-sidebar-overlay");
-  const close = sidebar.querySelector(".school-sidebar-close");
-  const content = document.querySelector(".school-content");
+  const overlay = document.querySelector("[data-navigation-overlay], .school-sidebar-overlay");
+  const close = sidebar.querySelector("[data-navigation-close], .school-sidebar-close");
+  const content = document.querySelector("[data-navigation-content], .school-content");
   const setExpanded = (expanded) => {
     sidebar.hidden = !expanded;
     toggle.setAttribute("aria-expanded", String(expanded));
@@ -33,10 +33,11 @@
   const syncViewport = () => {
     const wasInSidebar = sidebar.contains(document.activeElement);
     const wasOnToggle = document.activeElement === toggle;
+    const wasOnClose = document.activeElement === close;
     toggle.hidden = !mobile.matches;
     setExpanded(!mobile.matches);
     if (wasInSidebar && mobile.matches) toggle.focus();
-    if (wasOnToggle && !mobile.matches) sidebar.querySelector("a")?.focus();
+    if ((wasOnToggle || wasOnClose) && !mobile.matches) sidebar.querySelector("a")?.focus();
   };
 
   toggle.addEventListener("click", () => {
@@ -74,6 +75,7 @@
     }
   });
   mobile.addEventListener("change", syncViewport);
+  sidebar.closest(".school-layout, .platform-layout")?.classList.add("navigation-enhanced");
   syncViewport();
 })();
 
@@ -193,3 +195,4 @@
     if (workspace.contains(event.detail.elt)) error.hidden = true;
   });
 })();
+

@@ -1,10 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "django",
-  "git": { "deploymentEnabled": false },
+  "git": {
+    "deploymentEnabled": false
+  },
   "functions": {
     "config/wsgi.py": {
-      "excludeFiles": "{.env,.env.*,**/*.sqlite3,media/**,private-media/**,.idea/**,.venv/**,venv/**,__pycache__/**,**/__pycache__/**,.pytest_cache/**,.ruff_cache/**,.vercel/**,tests/**,docs/**}"
+      "excludeFiles": "{.env,.env.*,**/*.sqlite3,media/**,private-media/**,.idea/**,.venv/**,venv/**,__pycache__/**,**/__pycache__/**,.pytest_cache/**,.ruff_cache/**,.vercel/**,tests/**,docs/**}",
+      "includeFiles": "{templates/**,apps/**/templates/**}"
+    },
+    "config/asgi.py": {
+      "excludeFiles": "{.env,.env.*,**/*.sqlite3,media/**,private-media/**,.idea/**,.venv/**,venv/**,__pycache__/**,**/__pycache__/**,.pytest_cache/**,.ruff_cache/**,.vercel/**,tests/**,docs/**}",
+      "includeFiles": "{templates/**,apps/**/templates/**}"
     }
   }
 }

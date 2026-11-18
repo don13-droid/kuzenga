@@ -16,8 +16,11 @@ def main():
         "VERCEL": "1",
         "DJANGO_SETTINGS_MODULE": "config.settings.production",
         "DJANGO_SECRET_KEY": secrets.token_urlsafe(64),
-        "DJANGO_ALLOWED_HOSTS": "preview.example.invalid",
+        "DJANGO_ALLOWED_HOSTS": "preview.example.invalid,platform.example.invalid,client.example.invalid",
         "DJANGO_CSRF_TRUSTED_ORIGINS": "https://preview.example.invalid",
+        "PUBLIC_SITE_HOST": "preview.example.invalid",
+        "PLATFORM_SITE_HOST": "platform.example.invalid",
+        "CLIENT_SITE_HOST": "client.example.invalid",
         # Exercise strict HSTS using only an isolated synthetic domain. Real domain
         # rollout must separately review these opt-ins and all its subdomains.
         "DJANGO_HSTS_INCLUDE_SUBDOMAINS": "True",
@@ -39,6 +42,8 @@ import django
 django.setup()
 from django.conf import settings
 from django.core.management import call_command
+from apps.core.hosts import PortalHostMiddleware
+PortalHostMiddleware(lambda request: None)
 call_command('check', deploy=True, fail_level='WARNING')
 with tempfile.TemporaryDirectory(prefix='kuzenga-static-') as directory:
     settings.STATIC_ROOT = Path(directory)

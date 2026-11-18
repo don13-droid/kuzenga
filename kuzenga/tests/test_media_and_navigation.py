@@ -88,3 +88,31 @@ def test_shared_shells_render_independent_sidebar_and_styles(client, tenant_a, a
     client.force_login(platform)
     html = client.get(reverse("superuser:tenant-directory")).content.decode()
     assert 'class="platform-content' in html and 'css/layout.css' in html
+
+
+def test_platform_shell_exposes_accessible_mobile_drawer(client):
+    platform = get_user_model().objects.create_superuser("mobile-platform@example.test", "unused-password")
+    client.force_login(platform)
+    html = client.get(reverse("superuser:tenant-directory")).content.decode()
+    assert 'id="platform-sidebar" data-navigation-sidebar' in html
+    assert 'aria-controls="platform-sidebar"' in html
+    assert 'data-navigation-toggle' in html and 'aria-expanded="true" hidden' in html
+    assert 'data-navigation-close hidden aria-label="Close navigation"' in html
+    assert 'data-navigation-overlay hidden aria-hidden="true"' in html
+    assert 'data-navigation-content' in html
+    assert 'js/school-layout.js' in html
+    assert 'href="#main-content"' in html
+
+
+def test_workspace_contact_and_copyright_are_shared(client, tenant_a, admin_a):
+    client.force_login(admin_a)
+    school = client.get(reverse("students:list")).content.decode()
+    platform = get_user_model().objects.create_superuser("footer-platform@example.test", "unused-password")
+    client.force_login(platform)
+    administration = client.get(reverse("superuser:tenant-directory")).content.decode()
+    client.logout()
+    sign_in = client.get(reverse("platform-login")).content.decode()
+    for html in (school, administration, sign_in):
+        assert 'mailto:info@elevondigitalzw.com' in html
+        assert '&copy; 2026 Elevon Digital. All rights reserved.' in html
+

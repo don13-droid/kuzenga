@@ -22,6 +22,26 @@ if not ALLOWED_HOSTS:  # noqa: F405
     raise RuntimeError("Set DJANGO_ALLOWED_HOSTS in production")
 if any(not re.fullmatch(r"[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?", host) for host in ALLOWED_HOSTS):  # noqa: F405
     raise RuntimeError("DJANGO_ALLOWED_HOSTS must contain explicit hostnames without wildcards, ports or schemes")
+# Vercel supplies these exact deployment/branch DNS names; never infer trust from
+# request headers or grant access to every vercel.app deployment.
+if env.bool("VERCEL", default=False):  # noqa: F405
+    ALLOWED_HOSTS = list(ALLOWED_HOSTS)  # noqa: F405
+    for variable_name in ("VERCEL_URL", "VERCEL_BRANCH_URL"):
+        vercel_hostname = env(variable_name, default="")  # noqa: F405
+        if not vercel_hostname:
+            continue
+        if (
+            len(vercel_hostname) > 253
+            or not vercel_hostname.endswith(".vercel.app")
+            or any(
+                not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?", label)
+                for label in vercel_hostname.split(".")
+            )
+        ):
+            raise RuntimeError(f"{variable_name} must be an exact lowercase Vercel DNS hostname")
+        if vercel_hostname not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(vercel_hostname)
+
 CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[])  # noqa: F405
 for origin in CSRF_TRUSTED_ORIGINS:
     parsed = urlsplit(origin)

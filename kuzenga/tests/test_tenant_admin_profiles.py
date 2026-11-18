@@ -55,7 +55,7 @@ def platform_user():
     return User.objects.create_superuser("tenant-editor@example.test", "Unused-password-1!")
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 def test_superuser_can_create_tenant_with_school_contacts_and_logo(
     client, platform_user, media_root
 ):
@@ -79,9 +79,9 @@ def test_superuser_can_create_tenant_with_school_contacts_and_logo(
     assert tenant.logo.path.startswith(str(media_root))
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 def test_tenant_edit_replaces_and_removes_school_and_admin_images(
-    client, tenant_a, admin_a, platform_user, media_root
+    client, tenant_a, admin_a, platform_user, media_root, django_capture_on_commit_callbacks
 ):
     Membership.objects.filter(user=admin_a, tenant=tenant_a).update(role=Role.OWNER)
     admin_a.full_name = "Original Administrator"
@@ -102,17 +102,18 @@ def test_tenant_edit_replaces_and_removes_school_and_admin_images(
     assert b"Primary Administrator Details" in edit_page.content
     assert b"tenant-images.js" in edit_page.content
 
-    replacement = client.post(
-        change_url,
-        {
-            **tenant_form_data(name="Updated Admin Form School", slug=tenant_a.slug),
-            **administrator_form_data(name="Updated Administrator", phone="+263 77 9999999"),
-            "logo": png_upload("replacement-school.png", color=(90, 12, 12)),
-            "administrator_profile_image": png_upload(
-                "replacement-admin.png", color=(12, 90, 12)
-            ),
-        },
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        replacement = client.post(
+            change_url,
+            {
+                **tenant_form_data(name="Updated Admin Form School", slug=tenant_a.slug),
+                **administrator_form_data(name="Updated Administrator", phone="+263 77 9999999"),
+                "logo": png_upload("replacement-school.png", color=(90, 12, 12)),
+                "administrator_profile_image": png_upload(
+                    "replacement-admin.png", color=(12, 90, 12)
+                ),
+            },
+        )
     assert replacement.status_code == 302
 
     tenant_a.refresh_from_db()
@@ -140,17 +141,18 @@ def test_tenant_edit_replaces_and_removes_school_and_admin_images(
     assert administrator_event.actor == platform_user
     assert "administrator_email" in administrator_event.changes["profile_fields_updated"]
 
-    removed = client.post(
-        change_url,
-        {
-            **tenant_form_data(name=tenant_a.name, slug=tenant_a.slug),
-            **administrator_form_data(
-                name=admin_a.full_name, email=admin_a.email, phone=admin_a.phone
-            ),
-            "logo-clear": "on",
-            "administrator_profile_image-clear": "on",
-        },
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        removed = client.post(
+            change_url,
+            {
+                **tenant_form_data(name=tenant_a.name, slug=tenant_a.slug),
+                **administrator_form_data(
+                    name=admin_a.full_name, email=admin_a.email, phone=admin_a.phone
+                ),
+                "logo-clear": "on",
+                "administrator_profile_image-clear": "on",
+            },
+        )
     assert removed.status_code == 302
     tenant_a.refresh_from_db()
     admin_a.refresh_from_db()
