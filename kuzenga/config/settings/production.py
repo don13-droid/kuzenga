@@ -18,6 +18,12 @@ if len(SECRET_KEY) < 50 or len(set(SECRET_KEY)) < 5 or SECRET_KEY.lower().starts
     ("replace-", "change-me", "your-secret")
 ):
     raise RuntimeError("Set a generated, non-placeholder DJANGO_SECRET_KEY of at least 50 characters in production")
+# Permit the exact hostname Vercel assigns to this deployment.
+vercel_hostname = env("VERCEL_URL", default="")  # noqa: F405
+if env.bool("VERCEL", default=False) and re.fullmatch(r"[a-zA-Z0-9.-]+\.vercel\.app", vercel_hostname):  # noqa: F405
+    if vercel_hostname not in ALLOWED_HOSTS:  # noqa: F405
+        ALLOWED_HOSTS.append(vercel_hostname)  # noqa: F405
+
 if not ALLOWED_HOSTS:  # noqa: F405
     raise RuntimeError("Set DJANGO_ALLOWED_HOSTS in production")
 if any(not re.fullmatch(r"[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?", host) for host in ALLOWED_HOSTS):  # noqa: F405
