@@ -72,6 +72,9 @@ def application_create(request):
     data = request.POST if request.method == "POST" else None
     form = ApplicationForm(data)
     document_form = ApplicationDocumentForm(data, request.FILES or None, prefix="document")
+    # The entire supporting document is optional on creation. Keep server-side
+    # validation when a document is supplied, without blocking HTML submission.
+    document_form.use_required_attribute = False
     if request.method == "POST":
         valid = form.is_valid()
         has_document = bool(request.POST.get("document-title", "").strip() or request.FILES.get("document-file"))
