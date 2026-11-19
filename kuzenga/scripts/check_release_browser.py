@@ -90,6 +90,7 @@ def prepare(database, password):
         "database": str(database),
         "tenant_id": tenant.pk,
         "class_id": str(group.pk),
+        "grade_id": str(grade.pk),
         "year_id": str(year.pk),
         "today": today.isoformat(),
         "year_start": year_start.isoformat(),
@@ -333,6 +334,7 @@ def critical_workflow_checks(browser, origin, school_email, password, fixture):
         }.items():
             page.locator(f'[name="{name}"]').fill(value)
         page.locator('select[name="intended_year"]').select_option(fixture["year_id"])
+        page.locator('select[name="intended_grade"]').select_option(fixture["grade_id"])
         page.locator('select[name="intended_class"]').select_option(fixture["class_id"])
         page.get_by_role("button", name="Save and submit", exact=True).click()
         expect(page).to_have_url(re.compile(re.escape(origin) + r"/admissions/applications/[0-9a-f-]+/$"))
