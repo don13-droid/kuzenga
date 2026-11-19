@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Exists, OuterRef, Prefetch, Q, Value
 from django.db.models.functions import Concat
@@ -11,11 +11,35 @@ from django.views.decorators.http import require_GET, require_http_methods
 from apps.core import audit
 from apps.core.models import AuditEvent
 from apps.tenancy.access import access_required
+from apps.tenancy.models import Membership, Role
 from apps.tenancy.permissions import has_permission
 
 from . import services
 from .forms import DirectoryFilterForm, DocumentForm, EnrolForm, GuardianForm, StatusForm, StudentForm
 from .models import Student, StudentDocument, StudentEnrolment
+
+
+@access_required("students")
+@require_GET
+def student_dashboard(request):
+    membership = request.membership
+    if (membership is None or membership.role != Role.STUDENT
+            or membership.status != Membership.Status.ACTIVE
+            or membership.user_id != request.user.pk
+            or membership.tenant_id != request.tenant.pk
+            or not request.user.is_active or request.user.is_staff or request.user.is_superuser):
+        raise PermissionDenied
+    # Both the scoped manager and the explicit identity binding constrain this lookup.
+    student = Student.objects.filter(portal_user=request.user).first()
+    enrolments = StudentEnrolment.objects.none()
+    if student is not None:
+        enrolments = StudentEnrolment.objects.filter(student=student).select_related(
+            "class_group__grade", "class_group__academic_year"
+        ).order_by("-effective_from", "-created_at", "pk")
+    return render(request, "dashboard/student.html", {
+        "student_profile": student,
+        "student_enrolments": Paginator(enrolments, 25).get_page(request.GET.get("page")),
+    })
 
 
 @access_required("students", "students.view")
@@ -60,7 +84,7 @@ def student_list(request):
 @require_http_methods(["GET", "POST"])
 def student_create(request):
     data = request.POST if request.method == "POST" else None
-    form = StudentForm(data, request.FILES or None)
+    form = StudentForm(data, request.FILES or None, actor=request.user)
     guardian_form = GuardianForm(data, prefix="guardian", optional=True)
     if request.method == "POST":
         valid_student, valid_guardian = form.is_valid(), guardian_form.is_valid()
@@ -82,7 +106,8 @@ def student_create(request):
 @require_http_methods(["GET", "POST"])
 def student_edit(request, pk):
     student = get_object_or_404(Student, pk=pk)
-    form = StudentForm(request.POST if request.method == "POST" else None, request.FILES or None, instance=student)
+    form = StudentForm(request.POST if request.method == "POST" else None, request.FILES or None,
+                       instance=student, actor=request.user)
     if request.method == "POST" and form.is_valid():
         try:
             services.update_student(student, actor=request.user, request=request, **form.cleaned_data)
@@ -164,3 +189,4 @@ def document_download(request, pk, document_id):
     response["Cache-Control"] = "private, no-store"
     response["X-Content-Type-Options"] = "nosniff"
     return response
+

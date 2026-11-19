@@ -269,68 +269,37 @@
   </div>
 </section>
 <section id="pricing" class="section wrap pricing-section">
-<p class="eyebrow">STRAIGHTFORWARD TERMLY PRICING</p>
+<p class="eyebrow">PLANS FOR YOUR SCHOOL</p>
 <h2>A plan for your school.<br>
-<span class="muted">Room for what&rsquo;s next.</span>
+<span class="muted">Confirmed around your needs.</span>
 </h2>
-<p>Kuzenga Starter — From US$30 per school term. All prices in USD.</p>
-<div class="table-scroll" tabindex="0" role="region" aria-label="Subscription and once-off setup prices">
-<table>
-<caption>Per school term subscriptions · setup charged once</caption>
-<thead>
-<tr>
-<th scope="col">Student enrolment</th>
-<th scope="col">Starter</th>
-<th scope="col">Standard</th>
-<th scope="col">Professional</th>
-<th scope="col">Once-off setup</th>
-</tr>
-</thead>
-<tbody>{% for band in bands %}<tr>
-<th scope="row">{{ band.label }}</th>{% for price in band.prices %}<td>${{ price }}</td>{% endfor %}<td>{% if band.setup %}${{ band.setup }}{% else %}FREE{% endif %}</td>
-</tr>{% endfor %}<tr>
-<th scope="row">2,001+</th>
-<td>Custom</td>
-<td>Custom</td>
-<td>Custom</td>
-<td>From $120</td>
-</tr>
-</tbody>
-</table>
+<p>Kuzenga Starter — From US$30 per school term. All prices in USD. Final pricing depends on your school size and confirmed module access.</p>
+<div class="plans">
+<article>
+<h3>Starter</h3>
+<p><strong>From US$30 per school term</strong></p>
+<ul>
+<li>Student records, admissions and enrolment</li>
+<li>Academic years, terms, classes and subjects</li>
+<li>School workspace with role-based access</li>
+</ul>
+<a class="button" href="#contact">Discuss Starter</a>
+</article>
+<article>
+<h3>Standard</h3>
+<p><strong>Request a quotation</strong></p>
+<p>Discuss attendance and assessment workflows alongside student and academic administration.</p>
+<a class="outline" href="#contact" aria-label="Request a quotation for Standard">Request a quotation</a>
+</article>
+<article>
+<h3>Professional</h3>
+<p><strong>Request a quotation</strong></p>
+<p>Discuss controlled school finance workflows, billing, recorded payments, balances and reporting.</p>
+<a class="outline" href="#contact" aria-label="Request a quotation for Professional">Request a quotation</a>
+</article>
 </div>
-<p>Enterprise requires a quotation. Setup includes standard school configuration, initial user setup, academic structure configuration, standard student data import and basic remote training. Complex migration, custom implementation and on-site training are quoted separately.</p>
-<div class="plans">{% for plan, items in features.items %}<article>
-<h3>{{ plan }}</h3>
-<ul>{% for item in items %}<li>{{ item }}</li>{% endfor %}</ul>
-</article>{% endfor %}</div>
-<p class="fine">Plan scope above is the commercial catalogue. Module availability must be confirmed in your quotation: some listed capabilities are not yet implemented. Enterprise access for complex or multi-campus institutions is subject to implemented functionality and commercial agreement. Available modules and support arrangements must be confirmed before purchase.</p>
-<div class="calculator">
-<div>
-<h3>Estimate your school’s costs</h3>
-<p>Three terms per year. Included modules are never charged again.</p>
-<label for="enrolment">Student enrolment</label>
-<input id="enrolment" type="number" min="0" step="1" value="100">
-<label for="plan">Subscription plan</label>
-<select id="plan">
-<option value="starter">Starter</option>
-<option value="standard">Standard</option>
-<option value="professional">Professional</option>
-<option value="enterprise">Enterprise</option>
-</select>
-<fieldset>
-<legend>Optional modules · per school term</legend>{% for addon in addons %}<label class="check">
-<input type="checkbox" value="{{ addon.code }}" name="addon">{{ addon.label }} — {% if addon.from_price %}from {% endif %}${{ addon.price }}<small data-included="{{ addon.code }}">
-</small>
-</label>{% endfor %}</fieldset>
-</div>
-<div>
-<output id="quote" aria-live="polite">
-</output>
-<noscript>Enable JavaScript for an interactive estimate, or use the pricing table and contact sales.</noscript>
-<p class="fine">External messaging charges, payment processing costs and custom integration development are excluded. Estimates do not change an existing contract or activate payment collection.</p>
-<a class="button" href="#contact">Discuss your requirements</a>
-</div>
-</div>{{ pricing|json_script:'pricing-data' }}</section>
+<p class="fine">We confirm the implemented modules, school-size limits, setup requirements and support arrangements in your written quotation. A quotation does not change existing subscriptions or activate unimplemented modules.</p>
+</section>
 <section id="faq" class="section wrap" aria-labelledby="faq-heading">
 <p class="eyebrow">KUZENGA QUESTIONS</p>
 <h2 id="faq-heading">School administration, explained.</h2>

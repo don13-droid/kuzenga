@@ -24,10 +24,10 @@ def test_student_can_sign_in_to_school_portal_and_sign_out(client, student_user,
     assert dashboard.status_code == 200
     assert dashboard.context["tenant"] == tenant_a
     assert dashboard.wsgi_request.membership.role == Role.STUDENT
-    assert dashboard.context["stats"] == []
+    assert dashboard.context["student_profile"] is None
     assert b"Active learners" not in dashboard.content
     assert b"No modules are active" not in dashboard.content
-    assert b"No workspaces are available for this account." in dashboard.content
+    assert b"Your student profile is not linked yet" in dashboard.content
     logout = client.post(reverse("logout"))
     assert logout.url == reverse("login")
     assert "_auth_user_id" not in client.session
@@ -78,3 +78,4 @@ def test_inactive_student_cannot_sign_in(client, student_user):
     })
     assert response.status_code == 200
     assert "_auth_user_id" not in client.session
+

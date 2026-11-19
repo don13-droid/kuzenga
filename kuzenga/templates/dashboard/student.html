@@ -1,0 +1,48 @@
+{% extends "base/base.html" %}
+{% block title %}My student dashboard &middot; Kuzenga{% endblock %}
+{% block content %}
+<section class="dashboard-welcome" aria-labelledby="student-dashboard-heading">
+  <h1 id="student-dashboard-heading">My student dashboard</h1>
+  <p class="welcome-caption">{{ tenant.name }}</p>
+</section>
+{% if student_profile %}
+<div class="dashboard-panels">
+  <section class="school-panel" aria-labelledby="student-profile-heading">
+    <h2 id="student-profile-heading">My profile</h2>
+    <dl class="dashboard-school-details">
+      <div><dt>Name</dt><dd>{{ student_profile.full_name }}</dd></div>
+      <div><dt>Admission number</dt><dd>{{ student_profile.admission_number }}</dd></div>
+      {% if student_profile.preferred_name %}<div><dt>Preferred name</dt><dd>{{ student_profile.preferred_name }}</dd></div>{% endif %}
+      <div><dt>Status</dt><dd>{{ student_profile.get_status_display }}</dd></div>
+      <div><dt>Date of birth</dt><dd>{{ student_profile.date_of_birth|date:"j M Y"|default:"Not provided" }}</dd></div>
+      <div><dt>Gender</dt><dd>{{ student_profile.get_gender_display|default:"Not provided" }}</dd></div>
+    </dl>
+    <p class="panel-caption">Contact your school administrator if any of these details need correcting.</p>
+  </section>
+  <section class="school-panel" aria-labelledby="student-enrolments-heading">
+    <h2 id="student-enrolments-heading">My class placements</h2>
+    {% for enrolment in student_enrolments %}
+      <article class="mb-4">
+        <h3>{{ enrolment.class_group.name }}</h3>
+        <p>{{ enrolment.class_group.grade.name }} &middot; {{ enrolment.class_group.academic_year.name }}</p>
+        <p class="panel-caption">{{ enrolment.effective_from|date:"j M Y" }} &ndash; {% if enrolment.effective_to %}{{ enrolment.effective_to|date:"j M Y" }}{% else %}Ongoing{% endif %}</p>
+      </article>
+    {% empty %}
+      <p class="panel-caption">No class placements have been recorded for you yet.</p>
+    {% endfor %}
+    {% if student_enrolments.has_other_pages %}
+      <nav aria-label="Class placement pages">
+        {% if student_enrolments.has_previous %}<a class="school-button school-button--secondary" href="?page={{ student_enrolments.previous_page_number }}">Previous</a>{% endif %}
+        <span>Page {{ student_enrolments.number }} of {{ student_enrolments.paginator.num_pages }}</span>
+        {% if student_enrolments.has_next %}<a class="school-button school-button--secondary" href="?page={{ student_enrolments.next_page_number }}">Next</a>{% endif %}
+      </nav>
+    {% endif %}
+  </section>
+</div>
+{% else %}
+<section class="school-panel" aria-labelledby="student-access-heading">
+  <h2 id="student-access-heading">Your student profile is not linked yet</h2>
+  <p class="panel-caption">Ask your school administrator to connect your login account to your student record.</p>
+</section>
+{% endif %}
+{% endblock %}

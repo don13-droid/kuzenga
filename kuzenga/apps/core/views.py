@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.accounts.forms import PlatformAuthenticationForm, SchoolAuthenticationForm
+from apps.tenancy.models import Role
 from apps.tenancy.permissions import has_permission
 from apps.tenancy.services import has_module
 
@@ -49,6 +50,10 @@ def dashboard(request):
         return redirect("superuser:tenant-directory")
     if request.tenant is None:
         return redirect("tenancy:select")
+    if request.membership.role == Role.STUDENT:
+        from apps.students.views import student_dashboard
+
+        return student_dashboard(request)
 
     stats = []
     if has_permission(request.membership, "students.view") and has_module(request.tenant, "students"):
@@ -60,4 +65,5 @@ def dashboard(request):
 
         stats.append(("Classes", ClassGroup.objects.count()))
     return render(request, "dashboard/index.html", {"stats": stats})
+
 
