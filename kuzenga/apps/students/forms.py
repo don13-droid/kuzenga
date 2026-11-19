@@ -1,9 +1,13 @@
 from django import forms
+from django.contrib.auth import get_user_model
 
 from apps.academics.models import AcademicYear, ClassGroup
+from apps.core.context import get_current_tenant
 from apps.core.forms import TenantModelForm
+from apps.tenancy.models import Membership, Role
 
 from .models import Guardian, Student, StudentDocument
+from .services import can_manage_portal_links
 
 DATE = forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")
 
@@ -16,11 +20,29 @@ class StudentForm(TenantModelForm):
 
     class Meta:
         model = Student
-        fields = ["admission_number", "first_name", "last_name", "preferred_name", "date_of_birth", "gender", "profile_image"]
+        fields = ["admission_number", "first_name", "last_name", "preferred_name", "date_of_birth", "gender", "profile_image", "portal_user"]
         widgets = {"date_of_birth": DATE}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, actor=None, **kwargs):
         super().__init__(*args, **kwargs)
+        tenant = get_current_tenant()
+        self.can_manage_portal_links = can_manage_portal_links(actor, tenant)
+        if self.can_manage_portal_links:
+            used = Student.objects.exclude(pk=self.instance.pk).filter(
+                portal_user__isnull=False
+            ).values("portal_user_id")
+            self.fields["portal_user"].queryset = get_user_model().objects.filter(
+                memberships__tenant=tenant, memberships__role=Role.STUDENT,
+                memberships__status=Membership.Status.ACTIVE, is_active=True,
+                is_staff=False, is_superuser=False,
+            ).exclude(pk__in=used).order_by("email")
+            self.fields["portal_user"].label = "Student login account (optional)"
+            self.fields["portal_user"].help_text = (
+                "Create and activate a Student account in Users & staff first, then select it here. "
+                "Leave blank to keep this record without portal access."
+            )
+        else:
+            self.fields.pop("portal_user")
         if not self.instance._state.adding:
             self.fields.pop("class_group")
             self.fields["admission_number"].disabled = True
@@ -28,6 +50,11 @@ class StudentForm(TenantModelForm):
 
     def clean(self):
         data = super().clean()
+        if "portal_user" in self.data and not self.can_manage_portal_links:
+            raise forms.ValidationError("Only a school owner or administrator can link student login accounts.")
+        if (self.can_manage_portal_links and self.instance.pk
+                and "portal_user" not in self.data):
+            data["portal_user"] = self.instance.portal_user
         dob, first, last = data.get("date_of_birth"), data.get("first_name"), data.get("last_name")
         if (
             dob
@@ -115,3 +142,4 @@ class DirectoryFilterForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields["class_group"].queryset = ClassGroup.objects.all()
         self.fields["academic_year"].queryset = AcademicYear.objects.all()
+

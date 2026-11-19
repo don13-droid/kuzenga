@@ -155,3 +155,17 @@ def test_public_search_metadata_and_contact_details(client):
     ):
         assert question in html
     assert "a separate student self-service portal is not currently available" in html
+
+
+@pytest.mark.django_db
+def test_public_pricing_only_publishes_confirmed_starter_price(client):
+    html = client.get("/").content.decode()
+    pricing = html.split('<section id="pricing"', 1)[1].split("</section>", 1)[0]
+    assert "From US$30 per school term" in pricing
+    assert "Request a quotation" in pricing
+    assert "Student records, admissions and enrolment" in pricing
+    assert "id=\"pricing-data\"" not in html
+    assert 'name="addon"' not in html
+    assert "Payroll" not in pricing and "Learning management system" not in pricing
+    assert "Parent portal" not in pricing
+    assert "Basic school fees and receipting" not in pricing

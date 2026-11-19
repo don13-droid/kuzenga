@@ -7,10 +7,34 @@ from django.utils import timezone
 from apps.core import audit
 from apps.core.context import get_current_tenant
 from apps.core.exceptions import TenantContextMissing, TenantMismatch
-from apps.tenancy.models import Membership, Tenant
+from apps.tenancy.models import Membership, Role, Tenant
 from apps.tenancy.permissions import has_permission
 
 from .models import AdmissionSequence, Guardian, Student, StudentDocument, StudentEnrolment, StudentGuardian
+
+
+def can_manage_portal_links(actor, tenant):
+    """Account-to-record associations require school administration authority."""
+    if (actor is None or tenant is None or tenant.status not in (Tenant.Status.ACTIVE, Tenant.Status.TRIAL)
+            or not actor.is_active
+            or actor.is_staff or actor.is_superuser):
+        return False
+    member = Membership.objects.filter(
+        user=actor, tenant=tenant, status=Membership.Status.ACTIVE,
+        role__in=(Role.OWNER, Role.ADMIN),
+    ).first()
+    return has_permission(member, "students.manage") and has_permission(member, "users.manage")
+
+
+def _record_portal_link(student, previous_user_id, *, actor, request=None):
+    audit.record(
+        "student.portal_link_changed", actor=actor, obj=student, request=request,
+        affected_user=student.portal_user,
+        changes={"portal_user": {
+            "before": str(previous_user_id) if previous_user_id else None,
+            "after": str(student.portal_user_id) if student.portal_user_id else None,
+        }},
+    )
 
 
 def _write_context(actor=None, *records):
@@ -94,12 +118,15 @@ def create_student(
     gender="",
     admission_number="",
     profile_image=None,
+    portal_user=None,
     guardian_data=None,
     class_group=None,
     actor=None,
     request=None,
 ) -> Student:
     tenant = _write_context(actor, class_group)
+    if portal_user is not None and not can_manage_portal_links(actor, tenant):
+        raise PermissionDenied
     Tenant.objects.select_for_update().get(pk=tenant.pk)
     student = Student(
         tenant=tenant,
@@ -110,10 +137,13 @@ def create_student(
         date_of_birth=date_of_birth,
         gender=gender,
         profile_image=profile_image or "",
+        portal_user=portal_user,
     )
     student.full_clean()
     student.save()
     audit.record("student.created", actor=actor, obj=student, request=request)
+    if portal_user is not None:
+        _record_portal_link(student, None, actor=actor, request=request)
     if class_group is not None:
         enrol_student(student, class_group, actor=actor, request=request)
     if guardian_data:
@@ -158,16 +188,24 @@ def add_guardian(
 
 @transaction.atomic
 def update_student(student, *, actor, request=None, **data):
-    _write_context(actor, student)
+    tenant = _write_context(actor, student)
+    Tenant.objects.select_for_update().get(pk=tenant.pk)
     student = Student.objects.select_for_update().get(pk=student.pk)
+    previous_portal_user_id = student.portal_user_id
+    if "portal_user" in data:
+        next_user_id = data["portal_user"].pk if data["portal_user"] else None
+        if next_user_id != previous_portal_user_id and not can_manage_portal_links(actor, tenant):
+            raise PermissionDenied
     changed = []
-    for field in ("first_name", "last_name", "preferred_name", "date_of_birth", "gender", "profile_image"):
+    for field in ("first_name", "last_name", "preferred_name", "date_of_birth", "gender", "profile_image", "portal_user"):
         if field in data and getattr(student, field) != data[field]:
             value = "" if field == "profile_image" and data[field] is False else data[field]
             setattr(student, field, value)
             changed.append(field)
     student.full_clean()
     student.save()
+    if student.portal_user_id != previous_portal_user_id:
+        _record_portal_link(student, previous_portal_user_id, actor=actor, request=request)
     if changed:
         audit.record("student.updated", actor=actor, obj=student, request=request,
                      changes={field: "[REDACTED]" for field in changed})
@@ -213,3 +251,4 @@ def upload_document(student, *, title, file, actor, request=None):
     audit.record("student.document_uploaded", actor=actor, obj=document, request=request, student=student.pk)
     document.save()
     return document
+

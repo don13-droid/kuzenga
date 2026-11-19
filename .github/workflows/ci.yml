@@ -5,10 +5,14 @@ on:
     branches:
       - main
       - develop
+      - release
+      - preview
   pull_request:
     branches:
       - main
       - develop
+      - release
+      - preview
 
 permissions:
   contents: read

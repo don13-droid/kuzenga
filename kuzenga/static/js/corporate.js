@@ -1,5 +1,7 @@
 ﻿(() => {
-  const data = JSON.parse(document.getElementById("pricing-data").textContent);
+  const pricingData = document.getElementById("pricing-data");
+  if (!pricingData) return;
+  const data = JSON.parse(pricingData.textContent);
   const enrolment = document.getElementById("enrolment");
   const plan = document.getElementById("plan");
   const output = document.getElementById("quote");
