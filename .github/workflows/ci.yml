@@ -5,10 +5,14 @@ on:
     branches:
       - main
       - develop
+      - release
+      - preview
   pull_request:
     branches:
       - main
       - develop
+      - release
+      - preview
 
 permissions:
   contents: read
@@ -19,13 +23,17 @@ concurrency:
 
 jobs:
   test:
-    name: Test (Python 3.12, PostgreSQL 16)
+    name: Test (Python 3.12, PostgreSQL ${{ matrix.postgres }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: ["16", "18"]
 
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:${{ matrix.postgres }}-alpine
         env:
           POSTGRES_DB: kuzenga_ci
           POSTGRES_USER: kuzenga_ci
@@ -50,6 +58,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
       - name: Set up Python 3.12
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
@@ -84,5 +94,62 @@ jobs:
       - name: Run pytest suite
         run: python -m pytest -ra
 
+      - name: Verify concurrent PostgreSQL finance operations
+        run: python -m pytest tests/test_finance_postgresql.py -ra
+        env:
+          KUZENGA_RUN_PG_ACCEPTANCE: "1"
+
       - name: Check offline production configuration and static collection
         run: python scripts/check_deployment.py
+
+  dependency-audit:
+    name: Production dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned dependency auditor
+        run: python -m pip install pip-audit==2.9.0
+
+      - name: Audit pinned production dependencies
+        working-directory: kuzenga
+        run: python -m pip_audit --strict --requirement requirements/production.txt
+
+  browser-smoke:
+    name: Chromium public and portal smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: kuzenga
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12"
+
+      - name: Install project and pinned browser tooling
+        run: |
+          python -m pip install --requirement requirements/development.txt
+          python -m pip install playwright==1.62.0
+          python -m playwright install --with-deps chromium
+
+      - name: Capture read-only public DNS evidence
+        run: python scripts/capture_public_dns.py
+
+      - name: Run disposable browser acceptance
+        run: python scripts/check_release_browser.py

@@ -1,5 +1,7 @@
 ﻿(() => {
-  const data = JSON.parse(document.getElementById("pricing-data").textContent);
+  const pricingData = document.getElementById("pricing-data");
+  if (!pricingData) return;
+  const data = JSON.parse(pricingData.textContent);
   const enrolment = document.getElementById("enrolment");
   const plan = document.getElementById("plan");
   const output = document.getElementById("quote");
@@ -66,4 +68,29 @@
     .querySelectorAll('input[name="addon"]')
     .forEach((input) => input.addEventListener("change", update));
   update();
+})();
+
+// Product previews use the supplied screenshots; no simulated application data.
+(() => {
+  const buttons = [...document.querySelectorAll("[data-preview]")];
+  buttons.forEach((button) =>
+    button.addEventListener("click", () => {
+      buttons.forEach((item) => {
+        const selected = item === button;
+        item.setAttribute("aria-pressed", String(selected));
+        document.getElementById(`preview-${item.dataset.preview}`).hidden =
+          !selected;
+      });
+    }),
+  );
+  const menu = document.querySelector(".mobile-nav");
+  menu?.addEventListener("click", (event) => {
+    if (event.target.closest("a")) menu.open = false;
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menu?.open) {
+      menu.open = false;
+      menu.querySelector("summary").focus();
+    }
+  });
 })();

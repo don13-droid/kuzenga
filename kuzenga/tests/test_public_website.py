@@ -61,6 +61,7 @@ def test_enquiry_validation_storage_email_and_throttle(client, settings):
     assert client.post(reverse('corporate-home'), data).status_code == 302
     assert DemoEnquiry.objects.count() == 1
     assert len(mail.outbox) == 1
+    assert mail.outbox[0].to == ['inquiries@elevondigitalzw.com']
     assert data['email'] not in mail.outbox[0].body
     assert client.post(reverse('corporate-home'), data).status_code == 429
     assert DemoEnquiry.objects.count() == 1
@@ -92,3 +93,79 @@ def test_authenticated_root_is_public_and_dashboard_still_available(client, admi
     assert b'Elevating Ideas.' in client.get('/').content
     assert b'Welcome' in client.get(reverse('dashboard')).content
     assert reverse('dashboard') == '/dashboard/'
+
+
+@pytest.mark.django_db
+def test_redesigned_home_has_supplied_brand_photos_and_private_previews(client):
+    from django.contrib.staticfiles import finders
+    response = client.get('/')
+    html = response.content.decode()
+    for asset in ('elevon-logo', 'students-learning', 'teacher-classroom', 'digital-team', 'kuzenga-students', 'kuzenga-admissions'):
+        path = 'images/corporate/' + asset + '.png'
+        assert path in html
+        assert finders.find(path)
+    assert 'Privacy-edited student directory preview' in html
+    assert 'Privacy-edited admissions preview' in html
+    assert 'data-preview="students"' in html and 'data-preview="admissions"' in html
+    assert 'aria-label="Mobile navigation"' in html
+    assert 'School Login' in html and 'Student Login' in html
+
+
+def test_serverless_and_project_landing_templates_stay_in_sync():
+    from pathlib import Path
+
+    from django.conf import settings
+
+    project = Path(settings.BASE_DIR)
+    template = (project / "templates/public/home.html").read_text(encoding="utf-8")
+    assert template == (project / "apps/core/templates/public/home.html").read_text(encoding="utf-8")
+    assert "{{ portal_login_url }}" in template
+    assert "{{ platform_login_url }}" in template
+    assert "mailto:sales@elevondigitalzw.com" in template
+    assert "&copy; 2026 Elevon Digital. All rights reserved." in template
+
+
+@pytest.mark.django_db
+def test_public_search_metadata_and_contact_details(client):
+    import json
+    import re
+
+    html = client.get("/").content.decode()
+    assert '<link rel="canonical" href="https://www.elevondigitalzw.com/">' in html
+    for token in (
+        'property="og:title"', 'property="og:description"', 'property="og:url"',
+        'property="og:image"', 'name="twitter:card"', 'name="twitter:description"',
+        "mailto:inquiries@elevondigitalzw.com", "mailto:sales@elevondigitalzw.com",
+        "tel:+263774647140", "tel:+263710919170", "https://wa.me/263710919170",
+    ):
+        assert token in html
+    blocks = re.findall(r'<script type="application/ld\+json">([\s\S]*?)</script>', html)
+    assert len(blocks) == 1
+    graph = json.loads(blocks[0])["@graph"]
+    assert {item["@type"] for item in graph} == {
+        "Organization", "WebSite", "SoftwareApplication",
+    }
+    assert all(item["@id"].startswith("https://www.elevondigitalzw.com/") for item in graph)
+    for question in (
+        "What is Kuzenga?", "Who is Kuzenga designed for?",
+        "What school administration problems does Kuzenga address?",
+        "How does Kuzenga help manage school fees?",
+        "How does Kuzenga help school administrators?",
+        "How can schools request a demonstration?",
+    ):
+        assert question in html
+    assert "a separate student self-service portal is not currently available" in html
+
+
+@pytest.mark.django_db
+def test_public_pricing_only_publishes_confirmed_starter_price(client):
+    html = client.get("/").content.decode()
+    pricing = html.split('<section id="pricing"', 1)[1].split("</section>", 1)[0]
+    assert "From US$30 per school term" in pricing
+    assert "Request a quotation" in pricing
+    assert "Student records, admissions and enrolment" in pricing
+    assert "id=\"pricing-data\"" not in html
+    assert 'name="addon"' not in html
+    assert "Payroll" not in pricing and "Learning management system" not in pricing
+    assert "Parent portal" not in pricing
+    assert "Basic school fees and receipting" not in pricing

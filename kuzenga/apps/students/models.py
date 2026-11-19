@@ -43,6 +43,11 @@ class Student(TenantScopedModel):
     date_of_birth = models.DateField(null=True, blank=True)
     gender = models.CharField(max_length=1, choices=Gender.choices, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ACTIVE)
+    portal_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, db_index=False,
+        on_delete=models.SET_NULL, related_name="student_profiles",
+        help_text="An active student account at this school. Linking never changes an account's role.",
+    )
     profile_image = models.ImageField(
         upload_to=student_image_upload_to, blank=True, db_default="", validators=[validate_uploaded_image]
     )
@@ -51,13 +56,34 @@ class Student(TenantScopedModel):
         super().clean()
         if self.date_of_birth and self.date_of_birth > timezone.localdate():
             raise ValidationError({"date_of_birth": "Date of birth cannot be in the future."})
+        # Membership changes disable portal access immediately, but must not
+        # prevent an unrelated student update or status change. Revalidate
+        # eligibility whenever an association is first created or changed.
+        existing_link = self.portal_user_id and not self._state.adding and Student.objects.filter(
+            pk=self.pk, portal_user_id=self.portal_user_id
+        ).exists()
+        if self.portal_user_id and not existing_link:
+            from apps.tenancy.models import Membership, Role
+
+            allowed = Membership.objects.filter(
+                tenant_id=self.tenant_id, user_id=self.portal_user_id,
+                role=Role.STUDENT, status=Membership.Status.ACTIVE,
+                user__is_active=True, user__is_staff=False, user__is_superuser=False,
+            ).exists()
+            if not allowed:
+                raise ValidationError({
+                    "portal_user": "Choose an active student account belonging to this school."
+                })
 
     class Meta:
         ordering = ["last_name", "first_name"]
         constraints = [
             models.UniqueConstraint(
                 fields=["tenant", "admission_number"], name="uniq_admission_no_per_tenant"
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["tenant", "portal_user"], name="uniq_student_portal_user"
+            ),
         ]
         indexes = [models.Index(fields=["tenant", "last_name"])]
 
@@ -142,3 +168,4 @@ class StudentDocument(TenantScopedModel):
 
     def __str__(self):
         return self.title
+

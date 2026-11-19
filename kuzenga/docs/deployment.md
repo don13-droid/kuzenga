@@ -2,8 +2,9 @@
 
 Owner approved ADR-0002 for preparatory implementation on 2026-11-10, then
 explicitly requested a working Vercel preview and deployment fixes on 2026-11-13.
-The current task authorizes repairing and deploying the existing protected preview
-using its already configured Neon and Cloudflare R2 resources. It does not authorize
+That earlier preview task authorized repairing and deploying the protected preview
+using its configured Neon and Cloudflare R2 resources. The 2026-11-15 integration
+authorizes source integration and a draft PR only; it does not authorize any deployment,
 production deployment, production database operations, DNS writes, paid resources
 or merging to `main`. See the [approval record](../../docs/architecture/decisions/0002-vercel-deployment.md)
 and [audit/release checklist](../../docs/operations/vercel-deployment.md).
@@ -19,7 +20,8 @@ and `WSGI_APPLICATION` exist; this takes precedence over the WSGI entrypoint hin
 entrypoints. `vercel.json` sets production
 entrypoint options, excludes local data from the function and disables **all automatic Git
 deployments**. This is a source safeguard, not proof of remote account controls.
-The current owner request approves the protected preview; automatic Git deployments remain disabled.
+The earlier preview approval is historical; this integration does not authorize deployment.
+Automatic Git deployments remain disabled.
 `manage.py` defaults to production on Vercel for both native build discovery and
 management commands; local development keeps its existing default. Explicitly set
 the production settings module in remote environment scopes too. No legacy

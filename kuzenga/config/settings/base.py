@@ -15,6 +15,20 @@ if not env.bool("VERCEL", default=False):
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="dev-only-insecure-key")
 DEBUG = env.bool("DJANGO_DEBUG")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
+PUBLIC_SITE_HOST = env("PUBLIC_SITE_HOST", default="")
+PLATFORM_SITE_HOST = env("PLATFORM_SITE_HOST", default="")
+CLIENT_SITE_HOST = env("CLIENT_SITE_HOST", default="")
+CONTACT_EMAIL = env("CONTACT_EMAIL", default="inquiries@elevondigitalzw.com")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=CONTACT_EMAIL)
+# Provider host/port and credentials are supplied through the environment store.
+EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env.int("EMAIL_PORT", default=25)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=False)
+EMAIL_USE_SSL = env.bool("EMAIL_USE_SSL", default=False)
+EMAIL_TIMEOUT = env.int("EMAIL_TIMEOUT", default=10)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -37,6 +51,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "apps.core.seo.IndexingMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -44,6 +59,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.core.hosts.PortalHostMiddleware",
     "apps.tenancy.middleware.TenantMiddleware",
     "apps.core.direct_uploads.DirectUploadMiddleware",
 ]
@@ -115,3 +131,4 @@ LOGGING = {
     "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "standard"}},
     "root": {"handlers": ["console"], "level": env("LOG_LEVEL", default="INFO")},
 }
+

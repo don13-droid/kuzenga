@@ -41,30 +41,39 @@ def save_subscription(*, tenant, actor, plan, status, started_at, current_period
         field: {"before": previous.get(field), "after": getattr(sub, field)}
         for field in fields if previous.get(field) != getattr(sub, field)
     }
-    if subscription_id and not changes:
-        return sub
-    sub.save()
     # Only this record's plan grants are replaced. Independently approved grants survive.
     grants = Entitlement.objects.filter(
         tenant=tenant, subscription=sub, source__in=(Entitlement.Source.PLAN, Entitlement.Source.TRIAL)
-    )
+    ) if subscription_id else Entitlement.objects.none()
+    source = Entitlement.Source.TRIAL if sub.status == Subscription.Status.TRIAL else Entitlement.Source.PLAN
+    end = sub.trial_ends_at if sub.status == Subscription.Status.TRIAL else sub.current_period_end
+    expected = {
+        (module.pk, source, sub.started_at, end) for module in modules
+    } if sub.status in (Subscription.Status.ACTIVE, Subscription.Status.TRIAL) else set()
+    current = list(grants.filter(status=Entitlement.Status.ACTIVE).values_list(
+        "module_id", "source", "valid_from", "valid_until"
+    ))
+    if subscription_id and not changes and len(current) == len(expected) and set(current) == expected:
+        return sub
+    sub.save()
     grants.filter(status=Entitlement.Status.ACTIVE).update(status=Entitlement.Status.REVOKED)
     if sub.status in (Subscription.Status.ACTIVE, Subscription.Status.TRIAL):
-        end = sub.trial_ends_at if sub.status == Subscription.Status.TRIAL else sub.current_period_end
         for module in modules:
             Entitlement.objects.create(
                 tenant=tenant, subscription=sub, module=module,
-                source=Entitlement.Source.TRIAL if sub.status == Subscription.Status.TRIAL else Entitlement.Source.PLAN,
+                source=source,
                 valid_from=sub.started_at, valid_until=end,
             )
+    event_type = "reconciled" if subscription_id and not changes else "updated" if subscription_id else "created"
     SubscriptionEvent.objects.create(
         tenant=tenant, subscription=sub, actor=actor,
-        event_type="updated" if subscription_id else "created",
+        event_type=event_type,
         detail={"reason": reason.strip(), "plan": plan.code, "status": sub.status},
     )
     audit.record(
-        "subscription.updated" if subscription_id else "subscription.created",
+        f"subscription.{event_type}",
         actor=actor, tenant=tenant, obj=sub, request=request, changes=changes,
         reason=reason.strip(),
     )
     return sub
+

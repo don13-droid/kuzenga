@@ -14,7 +14,7 @@
       {% include 'components/school_kpi_card.html' with label=label value=value icon='Students' only %}
     {% endif %}
   {% empty %}
-    <section class="school-panel"><h2>School totals</h2><p class="panel-caption">{% include 'components/school_empty_state.html' with message="No modules are active for this school yet." only %}</p></section>
+    <section class="school-panel"><h2>Your school access</h2><p class="panel-caption">{% include 'components/school_empty_state.html' with message="Your account has no school totals to display. Contact your school administrator about available workspaces." only %}</p></section>
   {% endfor %}
 </div>
 <div class="dashboard-panels">
@@ -32,13 +32,14 @@
     <h2 id="quick-actions-heading">{% include 'components/school_icon.html' with name='Quick Actions' %} Quick Actions</h2>
     <p>Open your school workspaces</p>
     <div class="quick-action-grid">
-      {% for item in nav_items %}{% if item.url != 'dashboard' %}
+      {% for item in quick_action_items %}
         <a href="{% url item.url %}">
           <span aria-hidden="true">{% include 'components/school_icon.html' with name=item.label %}</span>
           {{ item.label }}{% if item.locked %}<small class="quick-action-locked">Not in your plan</small>{% endif %}
         </a>
-      {% endif %}{% empty %}<p class="quick-actions-empty">{% include 'components/school_empty_state.html' with message="No workspaces are available for this account." only %}</p>{% endfor %}
+      {% empty %}<p class="quick-actions-empty">{% include 'components/school_empty_state.html' with message="No workspaces are available for this account." only %}</p>{% endfor %}
     </div>
   </section>
 </div>
 {% endblock %}
+
