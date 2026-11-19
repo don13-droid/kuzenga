@@ -219,8 +219,17 @@ def workflow_state(fixture):
         from apps.core.context import tenant_context
         from apps.core.models import AuditEvent
         from apps.finance.models import (
-            Account, AccountingPeriod, Currency, FeeRule, Invoice, Journal,
-            JournalLine, Payment, PaymentAllocation, Receipt, StudentAccount,
+            Account,
+            AccountingPeriod,
+            Currency,
+            FeeRule,
+            Invoice,
+            Journal,
+            JournalLine,
+            Payment,
+            PaymentAllocation,
+            Receipt,
+            StudentAccount,
         )
         from apps.finance.workflows import invoice_outstanding, payment_state
         from apps.students.models import Student, StudentEnrolment, StudentGuardian
@@ -323,6 +332,7 @@ def critical_workflow_checks(browser, origin, school_email, password, fixture):
             "application_date": fixture["today"],
         }.items():
             page.locator(f'[name="{name}"]').fill(value)
+        page.locator('select[name="intended_year"]').select_option(fixture["year_id"])
         page.locator('select[name="intended_class"]').select_option(fixture["class_id"])
         page.get_by_role("button", name="Save and submit", exact=True).click()
         expect(page).to_have_url(re.compile(re.escape(origin) + r"/admissions/applications/[0-9a-f-]+/$"))
