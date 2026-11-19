@@ -337,6 +337,10 @@ def critical_workflow_checks(browser, origin, school_email, password, fixture):
         page.locator('select[name="intended_grade"]').select_option(fixture["grade_id"])
         page.locator('select[name="intended_class"]').select_option(fixture["class_id"])
         page.get_by_role("button", name="Save and submit", exact=True).click()
+        if urlsplit(page.url).path == "/admissions/applications/new/":
+            errors = page.locator(".errorlist, [role='alert'], .invalid-feedback, [aria-invalid='true']").all_text_contents()
+            invalid = page.locator("main form").first.evaluate("form => Array.from(form.elements).filter(el => el.willValidate && !el.checkValidity()).map(el => ({name: el.name, message: el.validationMessage, value: el.value}))")
+            raise AssertionError(f"Admissions submission did not redirect; form errors={errors!r}; invalid controls={invalid!r}; page={page.locator('main').inner_text()[:4000]!r}")
         expect(page).to_have_url(re.compile(re.escape(origin) + r"/admissions/applications/[0-9a-f-]+/$"))
         application_path = urlsplit(page.url).path
         expect(page.get_by_role("heading", name="Browser Learner", exact=True)).to_be_visible()
