@@ -1,0 +1,190 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#061B38">
+<meta name="description" content="Elevon Digital develops modern digital solutions. Explore Kuzenga school management and termly pricing.">
+<title>Elevon Digital | Elevating Ideas. Engineering Progress.</title>
+<link rel="stylesheet" href="{% static 'css/corporate.css' %}">
+<script src="{% static 'js/corporate.js' %}" defer>
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+<a class="wordmark" href="{% url 'corporate-home' %}">ELEVON<span>DIGITAL</span>
+</a>
+<nav aria-label="Main navigation">
+<a href="#about">About</a>
+<a href="#solutions">Solutions</a>
+<a href="#pricing">Pricing</a>
+<a href="{% url 'login' %}">School Login</a>
+<a href="{% url 'login' %}">Student Login</a>
+<a class="button small" href="#contact">Request a Demo</a>
+</nav>
+</header>
+<main id="main">
+<section class="hero wrap">
+<div class="hero-copy">
+<p class="eyebrow">ELEVON DIGITAL · ZIMBABWE</p>
+<h1>Elevating Ideas.<br>
+<em>Engineering Progress.</em>
+</h1>
+<p class="intro">Elevon Digital develops modern digital solutions that simplify operations, improve efficiency and help organisations achieve more.</p>
+<div class="actions">
+<a class="button" href="#kuzenga">Explore Kuzenga <span aria-hidden="true">↗</span>
+</a>
+<a class="outline" href="#contact">Request a Demo</a>
+</div>
+<p class="fine">Purposeful technology. Practical progress.</p>
+</div>
+<div class="hero-panel">
+<p class="eyebrow">OUR SCHOOL MANAGEMENT SOLUTION</p>
+<h2>Kuzenga</h2>
+<p>Bring school operations together.</p>
+<div class="product-list">
+<span>Student records & admissions</span>
+<span>Academic management & attendance</span>
+<span>School fees & financial operations</span>
+</div>
+<a href="#pricing">Starter — from US$30 per school term →</a>
+</div>
+</section>
+<section id="about" class="section wrap split">
+<p class="eyebrow">ABOUT ELEVON DIGITAL</p>
+<div>
+<h2>Digital solutions with everyday purpose.</h2>
+<p>We develop modern digital solutions to help organisations simplify their work and improve efficiency. Our focus is on useful software, clear experiences and practical operational needs.</p>
+</div>
+</section>
+<section id="solutions" class="section tinted">
+<div class="wrap">
+<p class="eyebrow">OUR SOLUTIONS</p>
+<h2>Built around the work that matters.</h2>
+<div id="kuzenga" class="solution">
+<div>
+<span class="tag">SCHOOL MANAGEMENT</span>
+<h3>Kuzenga</h3>
+<p>A connected workspace for school records, academic structures, attendance and finance, with school roles and tenant access controls.</p>
+<div class="actions">
+<a class="button" href="{% url 'login' %}">School Login</a>
+<a class="outline" href="{% url 'login' %}">Student Login</a>
+</div>
+<p class="fine">Students use the existing school sign-in. Access depends on their school membership and permissions.</p>
+</div>
+<div>
+<h3>One school. A clearer view.</h3>
+<ul>
+<li>Manage student records and admissions.</li>
+<li>Organise classes, subjects and academic years.</li>
+<li>Keep attendance and assessment workflows connected.</li>
+<li>Manage fees and financial records with controlled access.</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="pricing" class="section wrap">
+<p class="eyebrow">STRAIGHTFORWARD TERMLY PRICING</p>
+<h2>Choose the right starting point.</h2>
+<p>Kuzenga Starter — From US$30 per school term. All prices in USD.</p>
+<div class="table-scroll" tabindex="0" role="region" aria-label="Subscription and once-off setup prices">
+<table>
+<caption>Per school term subscriptions · setup charged once</caption>
+<thead>
+<tr>
+<th scope="col">Student enrolment</th>
+<th scope="col">Starter</th>
+<th scope="col">Standard</th>
+<th scope="col">Professional</th>
+<th scope="col">Once-off setup</th>
+</tr>
+</thead>
+<tbody>{% for band in bands %}<tr>
+<th scope="row">{{ band.label }}</th>{% for price in band.prices %}<td>${{ price }}</td>{% endfor %}<td>{% if band.setup %}${{ band.setup }}{% else %}FREE{% endif %}</td>
+</tr>{% endfor %}<tr>
+<th scope="row">2,001+</th>
+<td>Custom</td>
+<td>Custom</td>
+<td>Custom</td>
+<td>From $120</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Enterprise requires a quotation. Setup includes standard school configuration, initial user setup, academic structure configuration, standard student data import and basic remote training. Complex migration, custom implementation and on-site training are quoted separately.</p>
+<div class="plans">{% for plan, items in features.items %}<article>
+<h3>{{ plan }}</h3>
+<ul>{% for item in items %}<li>{{ item }}</li>{% endfor %}</ul>
+</article>{% endfor %}</div>
+<p class="fine">Plan scope above is the commercial catalogue. Module availability must be confirmed in your quotation: some listed capabilities are not yet implemented. Enterprise access for complex or multi-campus institutions is subject to implemented functionality and commercial agreement. All plans retain essential security, backups, tenant isolation, audit integrity and data export.</p>
+<div class="calculator">
+<div>
+<h3>Estimate your school’s costs</h3>
+<p>Three terms per year. Included modules are never charged again.</p>
+<label for="enrolment">Student enrolment</label>
+<input id="enrolment" type="number" min="0" step="1" value="100">
+<label for="plan">Subscription plan</label>
+<select id="plan">
+<option value="starter">Starter</option>
+<option value="standard">Standard</option>
+<option value="professional">Professional</option>
+<option value="enterprise">Enterprise</option>
+</select>
+<fieldset>
+<legend>Optional modules · per school term</legend>{% for addon in addons %}<label class="check">
+<input type="checkbox" value="{{ addon.code }}" name="addon">{{ addon.label }} — {% if addon.from_price %}from {% endif %}${{ addon.price }}<small data-included="{{ addon.code }}">
+</small>
+</label>{% endfor %}</fieldset>
+</div>
+<div>
+<output id="quote" aria-live="polite">
+</output>
+<noscript>Enable JavaScript for an interactive estimate, or use the pricing table and contact sales.</noscript>
+<p class="fine">External messaging charges, payment processing costs and custom integration development are excluded. Estimates do not change an existing contract or activate payment collection.</p>
+<a class="button" href="#contact">Discuss your requirements</a>
+</div>
+</div>{{ pricing|json_script:'pricing-data' }}</section>
+<section id="showcase" class="section tinted">
+<div class="wrap solution">
+<div>
+<p class="eyebrow">EXPERIENCE KUZENGA</p>
+<h2>See the workflows in a guided demo.</h2>
+<p>Explore student records, academic organisation and school operations with our team.</p>
+<a class="outline" href="#contact">Request an application walkthrough</a>
+</div>
+<figure class="office-photo">
+<img src="{% static 'images/corporate/school-office.png' %}" alt="Two school professionals reviewing documents together at a laptop" width="1536" height="1024" loading="lazy">
+<figcaption>Supporting the everyday work of school teams.</figcaption>
+</figure>
+</div>
+</section>
+<section id="contact" class="section wrap contact">
+<div>
+<p class="eyebrow">LET’S TALK</p>
+<h2>Move your school forward.</h2>
+<p>Tell us what your school needs. We’ll help you explore the right fit.</p>
+<p>General: <a href="mailto:inquiries@elevondigitalzw.com">inquiries@elevondigitalzw.com</a>
+</p>
+<p>Sales: <a href="mailto:sales@elevondigitalzw.com">sales@elevondigitalzw.com</a>
+</p>
+<p>WhatsApp: <a href="https://wa.me/263710919170">0710919170</a>
+</p>
+</div>
+<form method="post" action="{% url 'corporate-home' %}#contact">{% csrf_token %}<input type="hidden" name="enquiry_token" value="{{ enquiry_token }}">
+<h3>Request a demo</h3>{% if sent %}<p role="status">Thank you. Your enquiry has been received.</p>{% endif %}{{ form.non_field_errors }}{% for field in form %}{% if field.is_hidden %}{{ field }}{% else %}<div class="field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>{% endif %}{% endfor %}<p class="fine">We store these details to respond to your enquiry. Please do not include student records or financial information.</p>
+<button class="button" type="submit">Send enquiry</button>
+</form>
+</section>
+</main>
+<footer class="wrap footer">
+<a class="wordmark" href="{% url 'corporate-home' %}">ELEVON<span>DIGITAL</span>
+</a>
+<a href="https://www.elevondigitalzw.com">www.elevondigitalzw.com</a>
+<a href="{% url 'platform-login' %}">Platform Administration</a>
+</footer>
+<a class="whatsapp" href="https://wa.me/263710919170" aria-label="Contact Elevon Digital on WhatsApp">WhatsApp ↗</a>
+</body>
+</html>
