@@ -8,6 +8,9 @@
     "config/wsgi.py": {
       "includeFiles": "templates/**",
       "excludeFiles": "{.env,.env.*,**/*.sqlite3,media/**,private-media/**,.idea/**,.venv/**,venv/**,__pycache__/**,**/__pycache__/**,.pytest_cache/**,.ruff_cache/**,.vercel/**,tests/**,docs/**}"
+    },
+    "config/asgi.py": {
+      "includeFiles": "templates/**"
     }
   }
 }
